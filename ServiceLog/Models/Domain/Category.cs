@@ -5,8 +5,9 @@ namespace ServiceLog.Models.Domain
 {
     public class Category
     {
-        [BsonId]
-        public Guid Id { get; set; }
+        [BsonId] 
+        [BsonRepresentation(BsonType.ObjectId)] 
+        public string Id { get; set; } 
 
         [BsonElement("name")]
         public string Name { get; set; }

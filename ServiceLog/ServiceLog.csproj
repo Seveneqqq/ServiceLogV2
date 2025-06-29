@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <Folder Include="Models\DTO\" />
+    <Folder Include="https\" />
     <Folder Include="Services\" />
     <Folder Include="Repositories\" />
   </ItemGroup>

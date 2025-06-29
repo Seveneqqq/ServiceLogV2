@@ -6,7 +6,8 @@ namespace ServiceLog.Models.Domain
     public class Ticket
     {
         [BsonId]
-        public Guid Id { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
 
         [BsonElement("received_date")]
         public DateTime ReceivedDate { get; set; }
@@ -24,13 +25,13 @@ namespace ServiceLog.Models.Domain
         public string Description { get; set; }
 
         [BsonElement("client_id")]
-        public Guid ClientId { get; set; }
+        public string ClientId { get; set; }
 
         [BsonElement("status_history")]
         public List<StatusHistoryEntry> StatusHistory { get; set; } = new List<StatusHistoryEntry>();
 
         [BsonElement("technicant_id")]
-        public Guid TechnicantId { get; set; }
+        public string TechnicantId { get; set; }
 
         [BsonElement("receiving_method")]
         public string ReceivingMethod { get; set; }
@@ -48,6 +49,6 @@ namespace ServiceLog.Models.Domain
         public DateTime Date { get; set; }
 
         [BsonElement("technicant_id")]
-        public Guid TechnicantId { get; set; }
+        public string TechnicantId { get; set; }
     }
 }
