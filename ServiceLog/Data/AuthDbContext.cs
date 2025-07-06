@@ -6,7 +6,7 @@ namespace ServiceLog.Data
 {
     public class AuthDbContext : IdentityDbContext<IdentityUser>
     {
-        public AuthDbContext(DbContextOptions<AuthDbContext> dbContextOptions): base(dbContextOptions)
+        public AuthDbContext(DbContextOptions<AuthDbContext> options): base(options)
         {
             
         }

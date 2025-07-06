@@ -8,6 +8,10 @@ using ServiceLog.Data;
 using Microsoft.AspNetCore.Mvc;
 using ServiceLog.Models.Domain;
 using MongoDB.Driver;
+using System;
+using Microsoft.IdentityModel.Tokens;
+using ServiceLog.Services.interfaces;
+using ServiceLog.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,8 +19,39 @@ var builder = WebApplication.CreateBuilder(args);
 var logger = new LoggerConfiguration()
     .WriteTo.Console()
     .WriteTo.File("Logs/ServiceLog_Log.txt", rollingInterval: RollingInterval.Minute)
-    .MinimumLevel.Warning()
+    .MinimumLevel.Error()
     .CreateLogger();
+
+builder.Services.AddIdentityCore<IdentityUser>()
+    .AddRoles<IdentityRole>()
+    .AddTokenProvider<DataProtectorTokenProvider<IdentityUser>>("ServiceLog")
+    .AddEntityFrameworkStores<AuthDbContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequiredLength = 6;
+    options.Password.RequiredUniqueChars = 1;
+});
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    });
+
 
 builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
@@ -27,21 +62,36 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("AuthConnectionString")));
 
 builder.Services.Configure<MongoSettings>(builder.Configuration.GetSection("MongoSettings"));
 builder.Services.AddSingleton<MongoDbContext>();
 
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline
 app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
+app.UseCors("AllowAll");
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.MapGet("/seed-category", async ([FromServices] MongoDbContext db) =>
@@ -50,12 +100,11 @@ app.MapGet("/seed-category", async ([FromServices] MongoDbContext db) =>
     {
         var newCategory = new Category
         {
-            // Id = nie ustawiaj tutaj!
             Name = "Laptop",
             ServiceOptions = new List<string>
     {
-        "Screen Replacement",
-        "Battery Replacement"
+        "Screen Replacement2",
+        "Battery Replacement2"
     }
         };
 
