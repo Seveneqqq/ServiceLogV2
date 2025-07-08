@@ -12,6 +12,7 @@ using System;
 using Microsoft.IdentityModel.Tokens;
 using ServiceLog.Services.interfaces;
 using ServiceLog.Services;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -94,6 +95,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
+
 app.MapGet("/seed-category", async ([FromServices] MongoDbContext db) =>
 {
     try
@@ -124,7 +126,7 @@ app.MapGet("/seed-category", async ([FromServices] MongoDbContext db) =>
     {
         return Results.Problem($"MongoDB timeout: Make sure MongoDB is running on localhost:27017");
     }
-});
+}).RequireAuthorization(new AuthorizeAttribute { Roles = "Admin" }); 
 
 
 

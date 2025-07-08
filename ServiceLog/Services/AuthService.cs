@@ -7,6 +7,7 @@ namespace ServiceLog.Services
 {
     public class AuthService : IAuthService
     {
+
         public readonly UserManager<IdentityUser> _userManager;
         public readonly ITokenService _tokenService;
 
@@ -20,6 +21,7 @@ namespace ServiceLog.Services
         {
 
             IdentityUser user;
+
 
             if (!string.IsNullOrWhiteSpace(loginDto.Email))
             {
@@ -40,7 +42,7 @@ namespace ServiceLog.Services
                 {
                     Success = checkPasswordResult,
                     Message = checkPasswordResult ? "User logged successfully !" : "Incorrect password !",
-                    Token = checkPasswordResult ? "Bearer " + _tokenService.GenerateToken(user, string.Join(",", userRole)) : null,
+                    Token = checkPasswordResult ? _tokenService.GenerateToken(user, string.Join(",", userRole)) : null,
                     Role = string.Join(",", userRole)
                 };
 
@@ -58,7 +60,11 @@ namespace ServiceLog.Services
         {
             if(string.IsNullOrWhiteSpace(registerDto.Username) || string.IsNullOrWhiteSpace(registerDto.Email))
             {
-                throw new ArgumentNullException("Please fill all fields");
+                return new RegisterResponseDto
+                {
+                    Success = false,
+                    Message = "Username or email cannot be empty."
+                };
             }
 
             var user = new IdentityUser
@@ -101,7 +107,7 @@ namespace ServiceLog.Services
             {
                 Success = result.Succeeded,
                 Message = result.Succeeded ? "User registered successfully !" : string.Join("; ", result.Errors.Select(e => e.Description)),
-                Token = result.Succeeded ? "Bearer " + _tokenService.GenerateToken(user, registerDto.Role) : null,
+                Token = result.Succeeded ? _tokenService.GenerateToken(user, registerDto.Role) : null,
                 Role = registerDto.Role
             };
 
