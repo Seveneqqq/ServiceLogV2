@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver;
-using ServiceLog.Models.Domain;
+﻿using ServiceLog.Models.Domain;
 
-namespace ServiceLog.Repositories
+namespace ServiceLog.Services.interfaces
 {
-    public interface ICategoryRepository
+    public interface ICategoryService
     {
         Task<List<Category>> GetAllCategoriesAsync();
         Task<Category> GetCategoryByIdAsync(string id);

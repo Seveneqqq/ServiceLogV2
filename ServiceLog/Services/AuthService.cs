@@ -58,7 +58,7 @@ namespace ServiceLog.Services
 
         public async Task<RegisterResponseDto> RegisterAsync(RegisterDto registerDto)
         {
-            if(string.IsNullOrWhiteSpace(registerDto.Username) || string.IsNullOrWhiteSpace(registerDto.Email))
+            if(string.IsNullOrWhiteSpace(registerDto.Username) && string.IsNullOrWhiteSpace(registerDto.Email))
             {
                 return new RegisterResponseDto
                 {
@@ -82,7 +82,7 @@ namespace ServiceLog.Services
                 };
             }
 
-            if(!string.IsNullOrWhiteSpace(user.Email) && !string.IsNullOrWhiteSpace(user.UserName)) { 
+            if(!string.IsNullOrWhiteSpace(user.Email) || !string.IsNullOrWhiteSpace(user.UserName)) { 
                 var findByUsername = await _userManager.FindByNameAsync(user.UserName);
                 var findByEmail = await _userManager.FindByEmailAsync(user.Email);
 
