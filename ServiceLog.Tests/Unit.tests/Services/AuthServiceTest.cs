@@ -71,7 +71,7 @@ namespace ServiceLog.Tests.Unit.tests.Services
 
             //Assert
             Assert.True(result.Success);
-
+            Assert.Equal("User registered successfully !", result.Message);
         }
 
         [Fact]
@@ -98,6 +98,7 @@ namespace ServiceLog.Tests.Unit.tests.Services
 
             //Assert
             Assert.True(result.Success);
+            Assert.Equal("User registered successfully !", result.Message);
 
         }
 
@@ -157,6 +158,89 @@ namespace ServiceLog.Tests.Unit.tests.Services
 
         }
 
+        [Fact]
+        public async Task Should_Returns_Empty_Username_Or_Email_Message() {
+
+            //Arrange
+
+            var mockUserManager = GetMockUserManager();
+            var mockTokenService = new Mock<ITokenService>();
+            var authService = new AuthService(mockUserManager.Object, mockTokenService.Object);
+
+            //Act
+
+            mockUserManagerAndTokenServiceSetup(mockUserManager, mockTokenService);
+
+            RegisterDto registerDto = new RegisterDto()
+            {
+                Password = "Test1234",
+                RepeatPassword = "Test1234",
+                Role = "Client"
+            };
+
+            var result = await authService.RegisterAsync(registerDto);
+
+            //Assert
+
+            Assert.False(result.Success);
+            Assert.Equal("Username or email cannot be empty.", result.Message);
+
+        }
+
+        [Fact]
+        public async Task Should_Returns_Different_Passwords_Message()
+        {
+
+            //Arrange
+
+            var mockUserManager = GetMockUserManager();
+            var mockTokenService = new Mock<ITokenService>();
+            var authService = new AuthService(mockUserManager.Object, mockTokenService.Object);
+
+            //Act
+
+            RegisterDto registerDto = new RegisterDto()
+            {
+                Username = "Test1234",
+                Password = "Test1234",
+                RepeatPassword = "Test12345",
+                Role = "Client"
+            };
+
+            var result = await authService.RegisterAsync(registerDto);
+
+            //Assert
+
+            Assert.False(result.Success);
+            Assert.Equal("Passwords do not match.", result.Message);
+
+        }
+
+        [Fact]
+        public async Task Should_Returns_Error_While_Request_is_empty()
+        {
+
+            //Arrange
+
+            var mockUserManager = GetMockUserManager();
+            var mockTokenService = new Mock<ITokenService>();
+            var authService = new AuthService(mockUserManager.Object, mockTokenService.Object);
+
+            //Act
+
+            RegisterDto registerDto = new RegisterDto()
+            {
+                
+            };
+
+            var result = await authService.RegisterAsync(registerDto);
+
+            //Assert
+
+            Assert.False(result.Success);
+            Assert.Contains("Username or email cannot be empty.", result.Message);
+
+        }
 
     }
 }

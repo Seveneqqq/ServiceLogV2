@@ -13,15 +13,19 @@ using Microsoft.IdentityModel.Tokens;
 using ServiceLog.Services.interfaces;
 using ServiceLog.Services;
 using Microsoft.AspNetCore.Authorization;
+using ServiceLog.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var logger = new LoggerConfiguration()
+Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .WriteTo.File("Logs/ServiceLog_Log.txt", rollingInterval: RollingInterval.Minute)
     .MinimumLevel.Error()
     .CreateLogger();
+
+
+builder.Host.UseSerilog();
 
 builder.Services.AddIdentityCore<IdentityUser>()
     .AddRoles<IdentityRole>()
@@ -53,9 +57,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     });
 
-
-builder.Logging.ClearProviders();
-builder.Logging.AddSerilog(logger);
 
 builder.Services.AddControllers();
 
@@ -91,6 +92,7 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
+app.UseMiddleware<ExceptionHandler>();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
