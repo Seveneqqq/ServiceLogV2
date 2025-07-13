@@ -8,5 +8,6 @@ namespace ServiceLog.Tests.Unit.tests.Services
 {
     internal class CategoryServiceTest
     {
+
     }
 }
