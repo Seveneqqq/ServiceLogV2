@@ -1,4 +1,5 @@
 ﻿using ServiceLog.Models.Domain;
+using ServiceLog.Models.Dto.CategoryDto;
 
 namespace ServiceLog.Services.interfaces
 {
@@ -6,7 +7,7 @@ namespace ServiceLog.Services.interfaces
     {
         Task<List<Category>> GetAllCategoriesAsync();
         Task<Category> GetCategoryByIdAsync(string id);
-        Task CreateCategoryAsync(Category category);
+        Task<NewCategoryResponseDto> CreateCategoryAsync(NewCategoryRequestDto newCategoryRequestDto);
         Task<Category> UpdateCategoryAsync(string id, Category category);
         Task DeleteCategoryAsync(string id);
         //Task<List<Category>> GetCategoriesByServiceOptionAsync(string serviceOption);

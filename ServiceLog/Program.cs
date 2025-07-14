@@ -14,6 +14,7 @@ using ServiceLog.Services.interfaces;
 using ServiceLog.Services;
 using Microsoft.AspNetCore.Authorization;
 using ServiceLog.Middlewares;
+using ServiceLog.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -81,8 +82,13 @@ builder.Services.AddDbContext<AuthDbContext>(options =>
 builder.Services.Configure<MongoSettings>(builder.Configuration.GetSection("MongoSettings"));
 builder.Services.AddSingleton<MongoDbContext>();
 
+//repository registration
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+//service registration
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 var app = builder.Build();
 
@@ -96,40 +102,5 @@ app.UseMiddleware<ExceptionHandler>();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
-
-app.MapGet("/seed-category", async ([FromServices] MongoDbContext db) =>
-{
-    try
-    {
-        var newCategory = new Category
-        {
-            Name = "Laptop",
-            ServiceOptions = new List<string>
-    {
-        "Screen Replacement2",
-        "Battery Replacement2"
-    }
-        };
-
-        await db.Categories.InsertOneAsync(newCategory);
-
-        return Results.Ok(new
-        {
-            message = "Category added successfully",
-            category = newCategory
-        });
-    }
-    catch (MongoDB.Driver.MongoConnectionException ex)
-    {
-        return Results.Problem($"MongoDB connection failed: {ex.Message}");
-    }
-    catch (System.TimeoutException)
-    {
-        return Results.Problem($"MongoDB timeout: Make sure MongoDB is running on localhost:27017");
-    }
-}).RequireAuthorization(new AuthorizeAttribute { Roles = "Admin" }); 
-
-
 
 app.Run();
