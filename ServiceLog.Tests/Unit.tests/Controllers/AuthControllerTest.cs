@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ServiceLog.Tests.Unit.tests.Controllers
 {
-    internal class AuthControllerTest
+    public class AuthControllerTest
     {
     }
 }
