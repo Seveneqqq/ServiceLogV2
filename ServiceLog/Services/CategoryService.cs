@@ -17,9 +17,22 @@ namespace ServiceLog.Services
             public async Task<NewCategoryResponseDto> CreateCategoryAsync(NewCategoryRequestDto newCategoryRequestDto)
             {
 
-                if(newCategoryRequestDto == null || string.IsNullOrEmpty(newCategoryRequestDto.Name))
+            if(newCategoryRequestDto.ServiceOptions == null && newCategoryRequestDto.Name == null && newCategoryRequestDto.Description == null)
             {
-                throw new ArgumentException("Invalid category data.");
+                return new NewCategoryResponseDto
+                {
+                    Success = false,
+                    Message = "Category request cannot be empty.",
+                };
+            }
+
+            if(newCategoryRequestDto.ServiceOptions == null || !newCategoryRequestDto.ServiceOptions.Any())
+            {
+                return new NewCategoryResponseDto
+                {
+                    Success = false,
+                    Message = "Service options cannot be empty.",
+                };
             }
 
             try
@@ -30,6 +43,7 @@ namespace ServiceLog.Services
                     Description = newCategoryRequestDto.Description,
                     ServiceOptions = newCategoryRequestDto.ServiceOptions,
                 };
+
 
                 await _categoryRepository.CreateCategoryAsync(category);
 
