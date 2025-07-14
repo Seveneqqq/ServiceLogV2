@@ -68,10 +68,42 @@ namespace ServiceLog.Services
                 throw new NotImplementedException();
             }
 
-            public async Task<List<Category>> GetAllCategoriesAsync()
+
+        public async Task<GetAllCategoryDto> GetAllCategoriesAsync()
+        {
+            try
             {
-                throw new NotImplementedException();
+                List<Category> categories = await _categoryRepository.GetAllCategoriesAsync();
+                
+                if(categories == null || !categories.Any())
+                {
+                    return new GetAllCategoryDto
+                    {
+                        Success = false,
+                        Message = "No categories found."
+                    };
+                }
+                else
+                {
+                    return new GetAllCategoryDto
+                    {
+                        Success = true,
+                        Categories = categories,
+                        Message = "Categories retrieved successfully."
+                    };
+                }
             }
+            catch (Exception e)
+            {
+                return new GetAllCategoryDto
+                {
+                    Success = false,
+                    Message = $"Error retrieving categories: {e.Message}",
+                };
+            }
+        }
+
+
 
             public async Task<Category> GetCategoryByIdAsync(string id)
             {

@@ -40,5 +40,30 @@ namespace ServiceLog.Controllers
             }
 
         }
+        [HttpGet("")]
+        public async Task<IActionResult> GetAllCategories()
+        {
+            try
+            {
+                var result = await _categoryService.GetAllCategoriesAsync();
+                if (result.Success)
+                {
+                    return Ok(result);
+                }
+                else if(result.Categories == null || !result.Categories.Any())
+                {
+                    return NotFound(result);
+                }
+                else
+                {
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"Error:: {e.Message}");
+            }
+
+        }
     }
 }

@@ -153,6 +153,7 @@ namespace ServiceLog.Tests.Unit.tests.Services
         public async Task CreateCategoryAsync_Should_ReturnFailed_When_Request_Empty()
         {
             // Arrange
+
             NewCategoryRequestDto newCategoryRequestDto = new NewCategoryRequestDto
             {
                 
