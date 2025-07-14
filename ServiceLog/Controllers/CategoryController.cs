@@ -25,7 +25,14 @@ namespace ServiceLog.Controllers
             try
             {
                 var result = await _categoryService.CreateCategoryAsync(newCategoryRequestDto);
-                return Ok(result);
+                if (result.Success)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest(result);
+                }
             }
             catch (Exception e)
             {
