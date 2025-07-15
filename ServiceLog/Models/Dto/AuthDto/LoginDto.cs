@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ServiceLog.Models.Dto.AuthDto
+namespace ServiceLog.Models.Dto
 {
     public class LoginDto
     {
@@ -10,6 +10,6 @@ namespace ServiceLog.Models.Dto.AuthDto
         public string? Email { get; set; }
 
         [Required]
-        public string Password { get; set; } = string.Empty;
+        public string Password { get; set; } = String.Empty;
     }
 }

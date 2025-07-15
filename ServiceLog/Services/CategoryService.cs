@@ -105,9 +105,39 @@ namespace ServiceLog.Services
 
 
 
-            public async Task<Category> GetCategoryByIdAsync(string id)
+            public async Task<GetByIdCategoryResponseDto> GetCategoryByIdAsync(string id)
             {
-                throw new NotImplementedException();
+                try
+                {
+                    var category = await _categoryRepository.GetCategoryByIdAsync(id);
+                    if (category != null)
+                    {
+                        return new GetByIdCategoryResponseDto
+                        {
+                            Success = true,
+                            Message = "Category retrieved successfully.",
+                            Category = category
+
+                        };
+                    }
+                    else
+                    {
+                        return new GetByIdCategoryResponseDto
+                        {
+                            Success = false,
+                            Message = "Category not found."
+                        };
+                    
+                    }
+                }
+                catch(Exception e)
+                {
+                    return new GetByIdCategoryResponseDto
+                    {
+                        Success = false,
+                        Message = $"Error retrieving category: {e.Message}"
+                    };
+                }
             }
 
             public async Task<Category> UpdateCategoryAsync(string id, Category category)
