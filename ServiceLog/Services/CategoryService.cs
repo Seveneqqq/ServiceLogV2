@@ -17,9 +17,22 @@ namespace ServiceLog.Services
             public async Task<NewCategoryResponseDto> CreateCategoryAsync(NewCategoryRequestDto newCategoryRequestDto)
             {
 
-                if(newCategoryRequestDto == null || string.IsNullOrEmpty(newCategoryRequestDto.Name))
+            if(newCategoryRequestDto.ServiceOptions == null && newCategoryRequestDto.Name == null && newCategoryRequestDto.Description == null)
             {
-                throw new ArgumentException("Invalid category data.");
+                return new NewCategoryResponseDto
+                {
+                    Success = false,
+                    Message = "Category request cannot be empty.",
+                };
+            }
+
+            if(newCategoryRequestDto.ServiceOptions == null || !newCategoryRequestDto.ServiceOptions.Any())
+            {
+                return new NewCategoryResponseDto
+                {
+                    Success = false,
+                    Message = "Service options cannot be empty.",
+                };
             }
 
             try
@@ -30,6 +43,7 @@ namespace ServiceLog.Services
                     Description = newCategoryRequestDto.Description,
                     ServiceOptions = newCategoryRequestDto.ServiceOptions,
                 };
+
 
                 await _categoryRepository.CreateCategoryAsync(category);
 
@@ -54,14 +68,76 @@ namespace ServiceLog.Services
                 throw new NotImplementedException();
             }
 
-            public async Task<List<Category>> GetAllCategoriesAsync()
-            {
-                throw new NotImplementedException();
-            }
 
-            public async Task<Category> GetCategoryByIdAsync(string id)
+        public async Task<GetAllCategoryDto> GetAllCategoriesAsync()
+        {
+            try
             {
-                throw new NotImplementedException();
+                List<Category> categories = await _categoryRepository.GetAllCategoriesAsync();
+                
+                if(categories == null || !categories.Any())
+                {
+                    return new GetAllCategoryDto
+                    {
+                        Success = false,
+                        Message = "No categories found."
+                    };
+                }
+                else
+                {
+                    return new GetAllCategoryDto
+                    {
+                        Success = true,
+                        Categories = categories,
+                        Message = "Categories retrieved successfully."
+                    };
+                }
+            }
+            catch (Exception e)
+            {
+                return new GetAllCategoryDto
+                {
+                    Success = false,
+                    Message = $"Error retrieving categories: {e.Message}",
+                };
+            }
+        }
+
+
+
+            public async Task<GetByIdCategoryResponseDto> GetCategoryByIdAsync(string id)
+            {
+                try
+                {
+                    var category = await _categoryRepository.GetCategoryByIdAsync(id);
+                    if (category != null)
+                    {
+                        return new GetByIdCategoryResponseDto
+                        {
+                            Success = true,
+                            Message = "Category retrieved successfully.",
+                            Category = category
+
+                        };
+                    }
+                    else
+                    {
+                        return new GetByIdCategoryResponseDto
+                        {
+                            Success = false,
+                            Message = "Category not found."
+                        };
+                    
+                    }
+                }
+                catch(Exception e)
+                {
+                    return new GetByIdCategoryResponseDto
+                    {
+                        Success = false,
+                        Message = $"Error retrieving category: {e.Message}"
+                    };
+                }
             }
 
             public async Task<Category> UpdateCategoryAsync(string id, Category category)

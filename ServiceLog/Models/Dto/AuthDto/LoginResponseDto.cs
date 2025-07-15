@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace ServiceLog.Models.Dto.AuthDto
+namespace ServiceLog.Models.Dto
 {
     public class LoginResponseDto
     {
