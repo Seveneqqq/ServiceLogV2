@@ -39,7 +39,7 @@ namespace ServiceLog.Controllers
             }
             catch(Exception e)
             {
-                return BadRequest($"Error:: {e.Message}");
+                return StatusCode(500, $"Error:: {e.Message}");
             }
            
         }
@@ -64,7 +64,7 @@ namespace ServiceLog.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest($"Error:: {e.Message}");
+                return StatusCode(500, $"Error:: {e.Message}");
             }
         }
     }
