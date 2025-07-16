@@ -60,7 +60,12 @@ namespace ServiceLog.Controllers
                     });
                     return Ok(result);
                 }
-                return Unauthorized(result);
+                else if(!result.Success && result.Message.Equals("User doesn't exists."))
+                {
+                    return NotFound(result);
+                }
+
+                   return Unauthorized(result);
             }
             catch (Exception e)
             {
