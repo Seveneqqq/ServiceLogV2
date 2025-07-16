@@ -1,20 +1,14 @@
-using Microsoft.Extensions.Logging;
 using Serilog;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
 using ServiceLog.Data;
-using Microsoft.AspNetCore.Mvc;
-using ServiceLog.Models.Domain;
-using MongoDB.Driver;
-using System;
 using Microsoft.IdentityModel.Tokens;
 using ServiceLog.Services.interfaces;
 using ServiceLog.Services;
-using Microsoft.AspNetCore.Authorization;
 using ServiceLog.Middlewares;
-using ServiceLog.Repositories;
+using ServiceLog.Repositories.CategoryRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 

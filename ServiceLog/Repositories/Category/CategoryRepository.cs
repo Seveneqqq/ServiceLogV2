@@ -2,7 +2,7 @@
 using ServiceLog.Data;
 using ServiceLog.Models.Domain;
 
-namespace ServiceLog.Repositories
+namespace ServiceLog.Repositories.CategoryRepository
 {
     public class CategoryRepository : ICategoryRepository
     {
@@ -18,9 +18,9 @@ namespace ServiceLog.Repositories
             await _mongoDbContext.Categories.InsertOneAsync(category);
         }
 
-        public async Task DeleteCategoryAsync(string id)
+        public async Task<DeleteResult> DeleteCategoryAsync(string id)
         {
-            await _mongoDbContext.Categories.DeleteOneAsync(id);   
+            return await _mongoDbContext.Categories.DeleteOneAsync(id);   
         }
 
         public async Task<List<Category>> GetAllCategoriesAsync()

@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Moq;
+﻿using Moq;
 using ServiceLog.Models.Domain;
-using ServiceLog.Models.Dto.CategoryDto;
-using ServiceLog.Repositories;
+using ServiceLog.Repositories.CategoryRepository;
 using ServiceLog.Services;
 
 namespace ServiceLog.Tests.Unit.tests.Services.CategoryServiceTests

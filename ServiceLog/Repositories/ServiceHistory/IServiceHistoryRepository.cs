@@ -1,4 +1,4 @@
-﻿namespace ServiceLog.Repositories
+﻿namespace ServiceLog.Repositories.ServiceHistory
 {
     public interface IServiceHistoryRepository
     {

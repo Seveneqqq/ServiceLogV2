@@ -49,7 +49,7 @@ namespace ServiceLog.Controllers
             try
             {
                 var result = await _authService.LoginAsync(loginDto);
-                if (result.Success)
+                if (result.Success && result.Token != null)
                 {
                     Response.Cookies.Append("jwt_token", result.Token, new CookieOptions
                     {
