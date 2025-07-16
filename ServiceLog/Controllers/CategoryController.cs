@@ -63,7 +63,7 @@ namespace ServiceLog.Controllers
 
         }
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetAllCategories([FromRoute] string id)
+        public async Task<IActionResult> GetCategoryById([FromRoute] string id)
         {
             try
             {

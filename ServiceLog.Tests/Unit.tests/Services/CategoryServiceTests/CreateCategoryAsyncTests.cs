@@ -4,14 +4,14 @@ using ServiceLog.Models.Dto.CategoryDto;
 using ServiceLog.Repositories;
 using ServiceLog.Services;
 
-namespace ServiceLog.Tests.Unit.tests.Services
+namespace ServiceLog.Tests.Unit.tests.Services.CategoryServiceTests
 {
-    public class CategoryServiceTest
+    public class CreateCategoryAsyncTests
     {
         private readonly Mock<ICategoryRepository> _categoryRepositoryMock;
         private readonly CategoryService _categoryService;
 
-        public CategoryServiceTest()
+        public CreateCategoryAsyncTests()
         {
             _categoryRepositoryMock = new Mock<ICategoryRepository>();
             _categoryService = new CategoryService(_categoryRepositoryMock.Object);
@@ -128,7 +128,8 @@ namespace ServiceLog.Tests.Unit.tests.Services
             {
                 Name = "Test Category",
                 Description = "Test Description",
-                ServiceOptions = new List<ServiceOption> {
+                ServiceOptions = new List<ServiceOption>
+                {
 
                 }
             };
@@ -156,7 +157,7 @@ namespace ServiceLog.Tests.Unit.tests.Services
 
             NewCategoryRequestDto newCategoryRequestDto = new NewCategoryRequestDto
             {
-                
+
             };
 
             _categoryRepositoryMock
@@ -175,6 +176,5 @@ namespace ServiceLog.Tests.Unit.tests.Services
             Assert.Equal("Category request cannot be empty.", result.Message);
 
         }
-
     }
 }

@@ -9,9 +9,9 @@ using ServiceLog.Services.interfaces;
 using ServiceLog.Services;
 using ServiceLog.Models.Dto;
 
-namespace ServiceLog.Tests.Unit.tests.Services
+namespace ServiceLog.Tests.Unit.tests.Services.AuthServiceTests
 {
-    public class AuthServiceTest
+    public class RegisterAsyncTests
     {
 
         static Mock<UserManager<IdentityUser>> GetMockUserManager()
