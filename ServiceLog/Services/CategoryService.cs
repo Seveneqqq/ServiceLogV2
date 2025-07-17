@@ -74,7 +74,12 @@ namespace ServiceLog.Services
 
             public async Task<DeleteCategoryResponseDto> DeleteCategoryAsync(string id)
             {
-                throw new NotImplementedException();
+                var result = await _categoryRepository.DeleteCategoryAsync(id);
+                return new DeleteCategoryResponseDto
+                {
+                    Success = result.DeletedCount > 0,
+                    Message = result.DeletedCount > 0 ? "Category deleted successfully." : "Category not found."
+                };
             }
 
             public async Task<Category> UpdateCategoryAsync(string id, Category category)
