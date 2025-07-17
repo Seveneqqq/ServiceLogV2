@@ -1,6 +1,6 @@
 ﻿using ServiceLog.Models.Domain;
 using ServiceLog.Models.Dto.CategoryDto;
-using ServiceLog.Repositories;
+using ServiceLog.Repositories.CategoryRepository;
 using ServiceLog.Services.interfaces;
 
 namespace ServiceLog.Services
@@ -23,6 +23,15 @@ namespace ServiceLog.Services
                 {
                     Success = false,
                     Message = "Category request cannot be empty.",
+                };
+            }
+
+            if (string.IsNullOrEmpty(newCategoryRequestDto.Name))
+            {
+                return new NewCategoryResponseDto
+                {
+                    Success = false,
+                    Message = "Category name cannot be empty.",
                 };
             }
 

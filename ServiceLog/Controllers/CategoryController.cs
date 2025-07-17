@@ -17,7 +17,7 @@ namespace ServiceLog.Controllers
         }
 
         [HttpPost("")]
-        public async Task<IActionResult> CreateNewCategory([FromBody] NewCategoryRequestDto newCategoryRequestDto)
+        public async Task<IActionResult> CreateNewCategoryAsync([FromBody] NewCategoryRequestDto newCategoryRequestDto)
         {
             try
             {
@@ -38,7 +38,7 @@ namespace ServiceLog.Controllers
 
         }
         [HttpGet("")]
-        public async Task<IActionResult> GetAllCategories()
+        public async Task<IActionResult> GetAllCategoriesAsync()
         {
             try
             {
@@ -63,7 +63,7 @@ namespace ServiceLog.Controllers
 
         }
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetAllCategories([FromRoute] string id)
+        public async Task<IActionResult> GetCategoryByIdAsync([FromRoute] string id)
         {
             try
             {

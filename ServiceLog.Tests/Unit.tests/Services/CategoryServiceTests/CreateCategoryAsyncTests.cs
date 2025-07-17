@@ -1,17 +1,17 @@
 ﻿using Moq;
 using ServiceLog.Models.Domain;
 using ServiceLog.Models.Dto.CategoryDto;
-using ServiceLog.Repositories;
+using ServiceLog.Repositories.CategoryRepository;
 using ServiceLog.Services;
 
-namespace ServiceLog.Tests.Unit.tests.Services
+namespace ServiceLog.Tests.Unit.tests.Services.CategoryServiceTests
 {
-    public class CategoryServiceTest
+    public class CreateCategoryAsyncTests
     {
         private readonly Mock<ICategoryRepository> _categoryRepositoryMock;
         private readonly CategoryService _categoryService;
 
-        public CategoryServiceTest()
+        public CreateCategoryAsyncTests()
         {
             _categoryRepositoryMock = new Mock<ICategoryRepository>();
             _categoryService = new CategoryService(_categoryRepositoryMock.Object);
@@ -128,7 +128,8 @@ namespace ServiceLog.Tests.Unit.tests.Services
             {
                 Name = "Test Category",
                 Description = "Test Description",
-                ServiceOptions = new List<ServiceOption> {
+                ServiceOptions = new List<ServiceOption>
+                {
 
                 }
             };
@@ -156,7 +157,7 @@ namespace ServiceLog.Tests.Unit.tests.Services
 
             NewCategoryRequestDto newCategoryRequestDto = new NewCategoryRequestDto
             {
-                
+
             };
 
             _categoryRepositoryMock
@@ -175,6 +176,42 @@ namespace ServiceLog.Tests.Unit.tests.Services
             Assert.Equal("Category request cannot be empty.", result.Message);
 
         }
+
+        [Fact]
+        public async Task CreateCategoryAsync_Should_ReturnFailed_When_Name_Is_Empty()
+        {
+            // Arrange
+
+            NewCategoryRequestDto newCategoryRequestDto = new NewCategoryRequestDto
+            {
+                Description = "Test Description",
+                ServiceOptions = new List<ServiceOption>
+                {
+                    new ServiceOption{
+                        Name = "Option 1",
+                        Description = "Option 1 Description",
+                        Note = "Option 1 Note"
+                    }
+                }
+            };
+
+            _categoryRepositoryMock
+                .Setup(repo => repo.CreateCategoryAsync(It.IsAny<Category>()))
+                .Returns(Task.CompletedTask);
+
+
+            // Act
+
+            var result = await _categoryService.CreateCategoryAsync(newCategoryRequestDto);
+
+            // Assert
+
+            Assert.NotNull(result);
+            Assert.False(result.Success);
+            Assert.Equal("Category name cannot be empty.", result.Message);
+
+        }
+
 
     }
 }

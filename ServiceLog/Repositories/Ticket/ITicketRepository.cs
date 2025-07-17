@@ -1,4 +1,4 @@
-﻿namespace ServiceLog.Repositories
+﻿namespace ServiceLog.Repositories.Ticket
 {
     public interface ITicketRepository
     {

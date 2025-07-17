@@ -51,7 +51,7 @@ namespace ServiceLog.Services
             return new LoginResponseDto
             {
                 Success = false,
-                Message = "User not found. Please check your credentials.",
+                Message = "User doesn't exists.",
             };
 
         }

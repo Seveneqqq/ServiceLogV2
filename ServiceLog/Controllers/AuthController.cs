@@ -49,7 +49,7 @@ namespace ServiceLog.Controllers
             try
             {
                 var result = await _authService.LoginAsync(loginDto);
-                if (result.Success)
+                if (result.Success && result.Token != null)
                 {
                     Response.Cookies.Append("jwt_token", result.Token, new CookieOptions
                     {
@@ -60,7 +60,12 @@ namespace ServiceLog.Controllers
                     });
                     return Ok(result);
                 }
-                return Unauthorized(result);
+                else if(!result.Success && result.Message.Equals("User doesn't exists."))
+                {
+                    return NotFound(result);
+                }
+
+                   return Unauthorized(result);
             }
             catch (Exception e)
             {

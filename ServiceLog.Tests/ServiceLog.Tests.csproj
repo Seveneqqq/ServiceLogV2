@@ -22,7 +22,6 @@
   <ItemGroup>
     <Folder Include="Functional.tests\" />
     <Folder Include="Integration.tests\" />
-    <Folder Include="Unit.tests\Controllers\" />
     <Folder Include="Unit.tests\Repositories\" />
   </ItemGroup>
 

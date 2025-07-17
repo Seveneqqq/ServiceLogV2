@@ -2,7 +2,7 @@
 using MongoDB.Driver;
 using ServiceLog.Models.Domain;
 
-namespace ServiceLog.Repositories
+namespace ServiceLog.Repositories.CategoryRepository
 {
     public interface ICategoryRepository
     {
@@ -10,7 +10,7 @@ namespace ServiceLog.Repositories
         Task<Category> GetCategoryByIdAsync(string id);
         Task CreateCategoryAsync(Category category);
         Task<Category> UpdateCategoryAsync(string id, Category category);
-        Task DeleteCategoryAsync(string id);
+        Task<DeleteResult> DeleteCategoryAsync(string id);
         //Task<List<Category>> GetCategoriesByServiceOptionAsync(string serviceOption);
     }
 }

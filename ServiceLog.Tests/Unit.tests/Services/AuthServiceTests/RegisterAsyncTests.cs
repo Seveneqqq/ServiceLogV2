@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Moq;
 using ServiceLog.Services.interfaces;
 using ServiceLog.Services;
 using ServiceLog.Models.Dto;
 
-namespace ServiceLog.Tests.Unit.tests.Services
+namespace ServiceLog.Tests.Unit.tests.Services.AuthServiceTests
 {
-    public class AuthServiceTest
+    public class RegisterAsyncTests
     {
 
         static Mock<UserManager<IdentityUser>> GetMockUserManager()
