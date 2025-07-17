@@ -72,14 +72,18 @@ namespace ServiceLog.Services
             }
         }
 
-            public async Task DeleteCategoryAsync(string id)
+            public async Task<DeleteCategoryResponseDto> DeleteCategoryAsync(string id)
             {
                 throw new NotImplementedException();
             }
 
+            public async Task<Category> UpdateCategoryAsync(string id, Category category)
+            {
+                throw new NotImplementedException();
+            }
 
-        public async Task<GetAllCategoryDto> GetAllCategoriesAsync()
-        {
+            public async Task<GetAllCategoryDto> GetAllCategoriesAsync()
+            {
             try
             {
                 List<Category> categories = await _categoryRepository.GetAllCategoriesAsync();
@@ -111,8 +115,6 @@ namespace ServiceLog.Services
                 };
             }
         }
-
-
 
             public async Task<GetByIdCategoryResponseDto> GetCategoryByIdAsync(string id)
             {
@@ -149,9 +151,5 @@ namespace ServiceLog.Services
                 }
             }
 
-            public async Task<Category> UpdateCategoryAsync(string id, Category category)
-            {
-                throw new NotImplementedException();
-            }
        }
 }

@@ -9,7 +9,7 @@ namespace ServiceLog.Services.interfaces
         Task<GetByIdCategoryResponseDto> GetCategoryByIdAsync(string id);
         Task<NewCategoryResponseDto> CreateCategoryAsync(NewCategoryRequestDto newCategoryRequestDto);
         Task<Category> UpdateCategoryAsync(string id, Category category);
-        Task DeleteCategoryAsync(string id);
+        Task<DeleteCategoryResponseDto> DeleteCategoryAsync(string id);
         //Task<List<Category>> GetCategoriesByServiceOptionAsync(string serviceOption);
     }
 }

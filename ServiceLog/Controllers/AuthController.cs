@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ServiceLog.Models.Dto;
 using ServiceLog.Services.interfaces;
+using static ServiceLog.Enums.AuthErrorCodes;
 
 namespace ServiceLog.Controllers
 {

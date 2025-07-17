@@ -12,6 +12,7 @@ using ServiceLog.Models.Dto;
 using ServiceLog.Repositories.CategoryRepository;
 using ServiceLog.Services;
 using ServiceLog.Services.interfaces;
+using static ServiceLog.Enums.AuthErrorCodes;
 
 namespace ServiceLog.Tests.Unit.tests.Controllers.AuthControllerTests
 {

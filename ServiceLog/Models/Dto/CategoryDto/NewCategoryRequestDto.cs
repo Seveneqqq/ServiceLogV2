@@ -1,15 +1,16 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using System.ComponentModel.DataAnnotations;
+using MongoDB.Bson.Serialization.Attributes;
 using ServiceLog.Models.Domain;
 
 namespace ServiceLog.Models.Dto.CategoryDto
 {
     public class NewCategoryRequestDto
     {
-        [BsonRequired]
+        [Required]
         public string Name { get; set; }
-        [BsonRequired]
+        [Required]
         public string Description { get; set; }
-        [BsonRequired]
+        [Required]
         public List<ServiceOption> ServiceOptions { get; set; }
     }
 }

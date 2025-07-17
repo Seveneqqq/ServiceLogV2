@@ -2,6 +2,7 @@
 using ServiceLog.Data;
 using ServiceLog.Models.Dto;
 using ServiceLog.Services.interfaces;
+using static ServiceLog.Enums.AuthErrorCodes;
 
 namespace ServiceLog.Services
 {

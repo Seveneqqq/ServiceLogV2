@@ -1,18 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using static ServiceLog.Enums.AuthErrorCodes;
 
 namespace ServiceLog.Models.Dto
 {
-    public enum AuthErrorCode
-    {
-
-        None,
-        UserNotFound,
-        InvalidPassword,
-        EmptyFields,
-        Unknown
-    }
-
     public class LoginResponseDto
     {
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
