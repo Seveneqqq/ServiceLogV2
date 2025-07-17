@@ -63,7 +63,7 @@ namespace ServiceLog.Tests.Unit.tests.Controllers.AuthControllerTests
         }
 
         [Fact]
-        public async Task Login_Should_Return_401_()
+        public async Task Login_Should_Return_401_Unauthorized()
         {
             // Arrange
             var loginDto = new LoginDto
@@ -79,6 +79,7 @@ namespace ServiceLog.Tests.Unit.tests.Controllers.AuthControllerTests
                 {
                     Success = false,
                     Message = "Incorrect password !",
+                    ErrorCode = AuthErrorCode.InvalidPassword
                 });
 
             // Act
@@ -88,7 +89,7 @@ namespace ServiceLog.Tests.Unit.tests.Controllers.AuthControllerTests
             Assert.Equal(401, unauthorizedResult.StatusCode);
         }
         [Fact]
-        public async Task Login_Should_Return_404_()
+        public async Task Login_Should_Return_404_NotFound()
         {
             // Arrange
             var loginDto = new LoginDto
@@ -104,6 +105,7 @@ namespace ServiceLog.Tests.Unit.tests.Controllers.AuthControllerTests
                 {
                     Success = false,
                     Message = "User doesn't exists.",
+                    ErrorCode = AuthErrorCode.UserNotFound
                 });
 
             // Act
@@ -112,5 +114,131 @@ namespace ServiceLog.Tests.Unit.tests.Controllers.AuthControllerTests
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
             Assert.Equal(404, notFoundResult.StatusCode);
         }
+
+        [Fact]
+        public async Task Login_Should_Return_Success_Using_Email()
+        {
+            // Arrange
+            var loginDto = new LoginDto
+            {
+                Email = "test@test.pl",
+                Password = "Test1234"
+            };
+
+            var jwtToken = "123213123-213123-213123";
+
+            _authServiceMock
+                .Setup(s => s.LoginAsync(It.Is<LoginDto>(
+                    dto => dto.Email == loginDto.Email && dto.Password == loginDto.Password && !string.IsNullOrEmpty(dto.Email))))
+                .ReturnsAsync(new LoginResponseDto
+                {
+                    Success = true,
+                    Token = jwtToken,
+                    Message = "Login successful.",
+                    Role = "Client"
+                });
+
+
+            _authController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+            };
+
+            // Act
+            var result = await _authController.Login(loginDto);
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(200, okResult.StatusCode);
+        }
+
+        [Fact]
+        public async Task Login_Should_Return_Success_Using_Username()
+        {
+            // Arrange
+            var loginDto = new LoginDto
+            {
+                Username = "testuser123@123.pl",
+                Password = "Test1234"
+            };
+
+            var jwtToken = "123213123-213123-213123";
+
+            _authServiceMock
+                .Setup(s => s.LoginAsync(It.Is<LoginDto>(
+                 dto => dto.Username == loginDto.Username && dto.Password == loginDto.Password && !string.IsNullOrEmpty(dto.Username))))
+                .ReturnsAsync(new LoginResponseDto
+                {
+                    Success = true,
+                    Token = jwtToken,
+                    Message = "Login successful.",
+                    Role = "Client"
+                });
+
+
+            _authController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+            };
+
+            // Act
+
+            var result = await _authController.Login(loginDto);
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var responseDto = Assert.IsType<LoginResponseDto>(okResult.Value);
+
+            // Assert
+
+            Assert.Equal(200, okResult.StatusCode);
+            Assert.True(responseDto.Success);
+            Assert.Equal("Login successful.", responseDto.Message);
+
+
+        }
+
+        [Fact]
+        public async Task Login_Should_Return_Failed_With_Empty_Request()
+        {
+            // Arrange
+            var loginDto = new LoginDto
+            {
+                Username = "testuser123@123.pl",
+                Password = "Test1234"
+            };
+
+            var jwtToken = "123213123-213123-213123";
+
+            _authServiceMock
+                .Setup(s => s.LoginAsync(It.Is<LoginDto>(
+                 dto => dto.Username == loginDto.Username && dto.Password == loginDto.Password && !string.IsNullOrEmpty(dto.Username))))
+                .ReturnsAsync(new LoginResponseDto
+                {
+                    Success = true,
+                    Token = jwtToken,
+                    Message = "Login successful.",
+                    Role = "Client"
+                });
+
+
+            _authController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+            };
+
+            // Act
+
+            var result = await _authController.Login(loginDto);
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var responseDto = Assert.IsType<LoginResponseDto>(okResult.Value);
+
+            // Assert
+
+            Assert.Equal(200, okResult.StatusCode);
+            Assert.True(responseDto.Success);
+            Assert.Equal("Login successful.", responseDto.Message);
+
+
+        }
+
+
     }
 }

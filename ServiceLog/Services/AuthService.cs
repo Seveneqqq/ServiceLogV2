@@ -22,6 +22,25 @@ namespace ServiceLog.Services
 
             IdentityUser user;
 
+            if (string.IsNullOrWhiteSpace(loginDto.Username) && string.IsNullOrWhiteSpace(loginDto.Email))
+            {
+                return new LoginResponseDto
+                {
+                    Success = false,
+                    Message = "Username or email cannot be empty.",
+                    ErrorCode = AuthErrorCode.EmptyFields
+                };
+            }
+
+            if (string.IsNullOrEmpty(loginDto.Password))
+            {
+                return new LoginResponseDto
+                {
+                    Success = false,
+                    Message = "Password cannot be empty.",
+                    ErrorCode = AuthErrorCode.EmptyFields
+                };
+            }
 
             if (!string.IsNullOrWhiteSpace(loginDto.Email))
             {
@@ -43,7 +62,8 @@ namespace ServiceLog.Services
                     Success = checkPasswordResult,
                     Message = checkPasswordResult ? "User logged successfully !" : "Incorrect password !",
                     Token = checkPasswordResult ? _tokenService.GenerateToken(user, string.Join(",", userRole)) : null,
-                    Role = string.Join(",", userRole)
+                    Role = string.Join(",", userRole), 
+                    ErrorCode = checkPasswordResult ? AuthErrorCode.None : AuthErrorCode.InvalidPassword
                 };
 
             }
@@ -52,6 +72,7 @@ namespace ServiceLog.Services
             {
                 Success = false,
                 Message = "User doesn't exists.",
+                ErrorCode = AuthErrorCode.UserNotFound
             };
 
         }
