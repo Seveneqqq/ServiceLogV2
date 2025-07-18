@@ -5,10 +5,10 @@ namespace ServiceLog.Services.interfaces
 {
     public interface ICategoryService
     {
-        Task<GetAllCategoryDto> GetAllCategoriesAsync();
+        Task<GetAllCategoryResponseDto> GetAllCategoriesAsync();
         Task<GetByIdCategoryResponseDto> GetCategoryByIdAsync(string id);
         Task<NewCategoryResponseDto> CreateCategoryAsync(NewCategoryRequestDto newCategoryRequestDto);
-        Task<Category> UpdateCategoryAsync(string id, Category category);
+        Task<UpdateCategoryResponseDto> UpdateCategoryAsync(string id, UpdateCategoryRequestDto updateCategoryRequestDto);
         Task<DeleteCategoryResponseDto> DeleteCategoryAsync(string id);
         //Task<List<Category>> GetCategoriesByServiceOptionAsync(string serviceOption);
     }

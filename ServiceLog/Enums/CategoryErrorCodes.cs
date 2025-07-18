@@ -4,10 +4,9 @@
     {
         public enum CategoryErrorCode
         {
-
             None,
             CategoryNotFound,
-            InvalidPassword,
+            InvalidData,
             EmptyFields,
             Unknown
         }

@@ -2,6 +2,7 @@
 using ServiceLog.Models.Dto.CategoryDto;
 using ServiceLog.Repositories.CategoryRepository;
 using ServiceLog.Services.interfaces;
+using static ServiceLog.Enums.CategoryErrorCodes;
 
 namespace ServiceLog.Services
 {
@@ -23,6 +24,7 @@ namespace ServiceLog.Services
                 {
                     Success = false,
                     Message = "Category request cannot be empty.",
+                    ErrorCode = CategoryErrorCode.EmptyFields
                 };
             }
 
@@ -32,6 +34,7 @@ namespace ServiceLog.Services
                 {
                     Success = false,
                     Message = "Category name cannot be empty.",
+                    ErrorCode = CategoryErrorCode.EmptyFields
                 };
             }
 
@@ -41,6 +44,7 @@ namespace ServiceLog.Services
                 {
                     Success = false,
                     Message = "Service options cannot be empty.",
+                    ErrorCode = CategoryErrorCode.EmptyFields
                 };
             }
 
@@ -68,26 +72,64 @@ namespace ServiceLog.Services
                 {
                     Success = false,
                     Message = $"Error creating category: {e.Message}",
+                    ErrorCode = CategoryErrorCode.Unknown
                 };
             }
         }
 
             public async Task<DeleteCategoryResponseDto> DeleteCategoryAsync(string id)
             {
-                var result = await _categoryRepository.DeleteCategoryAsync(id);
+
+            if (string.IsNullOrEmpty(id)) {
                 return new DeleteCategoryResponseDto
                 {
-                    Success = result.DeletedCount > 0,
-                    Message = result.DeletedCount > 0 ? "Category deleted successfully." : "Category not found."
+                    Success = false,
+                    Message = "Category ID cannot be empty.",
+                    ErrorCode = CategoryErrorCode.EmptyFields
                 };
             }
 
-            public async Task<Category> UpdateCategoryAsync(string id, Category category)
+            try
+            {
+                var result = await _categoryRepository.DeleteCategoryAsync(id);
+                
+                if(result.DeletedCount > 0)
+                {
+                    return new DeleteCategoryResponseDto
+                    {
+                        Success = true,
+                        Message = "Category deleted successfully."
+                    };
+                }
+                else
+                {
+                    return new DeleteCategoryResponseDto
+                    {
+                        Success = false,
+                        Message = "Category not found.",
+                        ErrorCode = CategoryErrorCode.CategoryNotFound
+                    };
+                }
+
+            }
+            catch (Exception e)
+            {
+                return new DeleteCategoryResponseDto
+                {
+                    Success = false,
+                    Message = $"Error deleting category: {e.Message}",
+                    ErrorCode = CategoryErrorCode.Unknown
+                };
+            }
+            }
+
+
+            public async Task<UpdateCategoryResponseDto> UpdateCategoryAsync(string id, UpdateCategoryRequestDto updateCategoryRequestDto)
             {
                 throw new NotImplementedException();
             }
 
-            public async Task<GetAllCategoryDto> GetAllCategoriesAsync()
+            public async Task<GetAllCategoryResponseDto> GetAllCategoriesAsync()
             {
             try
             {
@@ -95,15 +137,16 @@ namespace ServiceLog.Services
                 
                 if(categories == null || !categories.Any())
                 {
-                    return new GetAllCategoryDto
+                    return new GetAllCategoryResponseDto
                     {
                         Success = false,
-                        Message = "No categories found."
+                        Message = "No categories found.",
+                        ErrorCode = CategoryErrorCode.CategoryNotFound
                     };
                 }
                 else
                 {
-                    return new GetAllCategoryDto
+                    return new GetAllCategoryResponseDto
                     {
                         Success = true,
                         Categories = categories,
@@ -113,10 +156,11 @@ namespace ServiceLog.Services
             }
             catch (Exception e)
             {
-                return new GetAllCategoryDto
+                return new GetAllCategoryResponseDto
                 {
                     Success = false,
                     Message = $"Error retrieving categories: {e.Message}",
+                    ErrorCode = CategoryErrorCode.Unknown
                 };
             }
         }
@@ -142,6 +186,7 @@ namespace ServiceLog.Services
                         {
                             Success = false,
                             Message = "Category not found."
+                            ErrorCode = CategoryErrorCode.CategoryNotFound
                         };
                     
                     }
@@ -151,7 +196,8 @@ namespace ServiceLog.Services
                     return new GetByIdCategoryResponseDto
                     {
                         Success = false,
-                        Message = $"Error retrieving category: {e.Message}"
+                        Message = $"Error retrieving category: {e.Message}",
+                        ErrorCode = CategoryErrorCode.Unknown
                     };
                 }
             }

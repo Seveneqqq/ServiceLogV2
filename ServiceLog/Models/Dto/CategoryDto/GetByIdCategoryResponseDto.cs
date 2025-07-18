@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using ServiceLog.Models.Domain;
+using static ServiceLog.Enums.CategoryErrorCodes;
 
 namespace ServiceLog.Models.Dto.CategoryDto
 {
@@ -13,5 +14,7 @@ namespace ServiceLog.Models.Dto.CategoryDto
         public string Message { get; set; } = String.Empty;
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public Category? Category { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public CategoryErrorCode ErrorCode { get; set; } = CategoryErrorCode.None;
     }
 }

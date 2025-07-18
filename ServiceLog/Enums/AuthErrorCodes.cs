@@ -4,7 +4,6 @@
     {
         public enum AuthErrorCode
         {
-
             None,
             UserNotFound,
             InvalidPassword,
