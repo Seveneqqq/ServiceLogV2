@@ -12,6 +12,6 @@ namespace ServiceLog.Models.Dto.CategoryDto
         [Required]
         public string Description { get; set; } = string.Empty;
         [Required]
-        public List<ServiceOption> serviceOptions { get; set; } = new List<ServiceOption>();
+        public List<ServiceOption> ServiceOptions { get; set; } = new List<ServiceOption>();
     }
 }

@@ -88,7 +88,7 @@ namespace ServiceLog.Services
                     ErrorCode = CategoryErrorCode.EmptyFields
                 };
             }
-
+            
             try
             {
                 var result = await _categoryRepository.DeleteCategoryAsync(id);
@@ -123,11 +123,58 @@ namespace ServiceLog.Services
             }
             }
 
-
-            public async Task<UpdateCategoryResponseDto> UpdateCategoryAsync(string id, UpdateCategoryRequestDto updateCategoryRequestDto)
+        public async Task<UpdateCategoryResponseDto> UpdateCategoryAsync(string id, UpdateCategoryRequestDto updateCategoryRequestDto)
+        {
+            try
             {
-                throw new NotImplementedException();
+                if (string.IsNullOrEmpty(id))
+                {
+                    return new UpdateCategoryResponseDto
+                    {
+                        Success = false,
+                        Message = "Category ID cannot be empty.",
+                        ErrorCode = CategoryErrorCode.EmptyFields
+                    };
+                }
+                if (updateCategoryRequestDto == null || string.IsNullOrEmpty(updateCategoryRequestDto.Name) || updateCategoryRequestDto.ServiceOptions == null || !updateCategoryRequestDto.ServiceOptions.Any())
+                {
+                    return new UpdateCategoryResponseDto
+                    {
+                        Success = false,
+                        Message = "Invalid category update request.",
+                        ErrorCode = CategoryErrorCode.EmptyFields
+                    };
+                }
+                var existingCategory = await _categoryRepository.GetCategoryByIdAsync(id);
+                if (existingCategory == null)
+                {
+                    return new UpdateCategoryResponseDto
+                    {
+                        Success = false,
+                        Message = "Category not found.",
+                        ErrorCode = CategoryErrorCode.CategoryNotFound
+                    };
+                }
+                existingCategory.Name = updateCategoryRequestDto.Name;
+                existingCategory.Description = updateCategoryRequestDto.Description;
+                existingCategory.ServiceOptions = updateCategoryRequestDto.ServiceOptions;
+                var updatedCategory = await _categoryRepository.UpdateCategoryAsync(id, existingCategory);
+                return new UpdateCategoryResponseDto
+                {
+                    Success = true,
+                    Message = "Category updated successfully.",
+                };
             }
+            catch (Exception e)
+            {
+                return new UpdateCategoryResponseDto
+                {
+                    Success = false,
+                    Message = $"Error updating category: {e.Message}",
+                    ErrorCode = CategoryErrorCode.Unknown
+                };
+            }
+        }
 
             public async Task<GetAllCategoryResponseDto> GetAllCategoriesAsync()
             {
@@ -185,7 +232,7 @@ namespace ServiceLog.Services
                         return new GetByIdCategoryResponseDto
                         {
                             Success = false,
-                            Message = "Category not found."
+                            Message = "Category not found.",
                             ErrorCode = CategoryErrorCode.CategoryNotFound
                         };
                     
