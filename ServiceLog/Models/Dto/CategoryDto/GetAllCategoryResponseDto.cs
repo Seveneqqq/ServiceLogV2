@@ -14,7 +14,7 @@ namespace ServiceLog.Models.Dto.CategoryDto
         public string Message { get; set; } = String.Empty;
         [Required]
         public List<Category>? Categories { get; set; }
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public CategoryErrorCode ErrorCode { get; set; } = CategoryErrorCode.None;
     }
 }

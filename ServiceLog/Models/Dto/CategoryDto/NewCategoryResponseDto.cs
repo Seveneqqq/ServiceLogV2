@@ -10,7 +10,7 @@ namespace ServiceLog.Models.Dto.CategoryDto
         public bool Success { get; set; }
         [Required]
         public string Message { get; set; } = string.Empty;
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public CategoryErrorCode ErrorCode { get; set; } = CategoryErrorCode.None;
     }
 }

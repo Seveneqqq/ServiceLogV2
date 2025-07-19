@@ -13,7 +13,7 @@ namespace ServiceLog.Models.Dto
         [Required]
         public bool Success { get; set; } = false;
         public string? Message { get; set; } = "Login failed. Please try again.";
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public AuthErrorCode ErrorCode { get; set; } = AuthErrorCode.None;
     }
 }
