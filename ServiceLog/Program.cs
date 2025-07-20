@@ -9,6 +9,7 @@ using ServiceLog.Services.interfaces;
 using ServiceLog.Services;
 using ServiceLog.Middlewares;
 using ServiceLog.Repositories.CategoryRepository;
+using ServiceLog.Repositories.ServiceHistoryRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -81,8 +82,11 @@ builder.Services.AddSingleton<MongoDbContext>();
 
 //repository registration
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IServiceHistoryRepository, ServiceHistoryRepository>();
+
 
 //service registration
+builder.Services.AddScoped<IServiceHistoryService, ServiceHistoryService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
