@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ServiceLog.Models.Dto.CategoryDto;
 using ServiceLog.Services.interfaces;
+using static ServiceLog.Enums.AuthErrorCodes;
+using static ServiceLog.Enums.CategoryErrorCodes;
 
 namespace ServiceLog.Controllers
 {
@@ -26,10 +28,14 @@ namespace ServiceLog.Controllers
                 {
                     return Ok(result);
                 }
-                else
+                return result.ErrorCode switch
                 {
-                    return BadRequest(result);
-                }
+                    CategoryErrorCode.CategoryNotFound => NotFound(result),
+                    CategoryErrorCode.InvalidData => Unauthorized(result),
+                    CategoryErrorCode.EmptyFields => BadRequest(result),
+                    _ => BadRequest(result)
+                };
+
             }
             catch (Exception e)
             {
@@ -47,14 +53,14 @@ namespace ServiceLog.Controllers
                 {
                     return Ok(result);
                 }
-                else if(result.Categories == null || !result.Categories.Any())
+                return result.ErrorCode switch
                 {
-                    return NotFound(result);
-                }
-                else
-                {
-                    return BadRequest(result);
-                }
+                    CategoryErrorCode.CategoryNotFound => NotFound(result),
+                    CategoryErrorCode.InvalidData => Unauthorized(result),
+                    CategoryErrorCode.EmptyFields => BadRequest(result),
+                    _ => BadRequest(result)
+                };
+
             }
             catch (Exception e)
             {
@@ -72,14 +78,14 @@ namespace ServiceLog.Controllers
                 {
                     return Ok(result);
                 }
-                else if (!result.Success && result.Category == null && !result.Message.Contains("Error"))
+                return result.ErrorCode switch
                 {
-                    return NotFound(result);
-                }
-                else
-                {
-                    return BadRequest(result);
-                }
+                    CategoryErrorCode.CategoryNotFound => NotFound(result),
+                    CategoryErrorCode.InvalidData => Unauthorized(result),
+                    CategoryErrorCode.EmptyFields => BadRequest(result),
+                    _ => BadRequest(result)
+                };
+
             }
             catch (Exception e)
             {
@@ -87,5 +93,54 @@ namespace ServiceLog.Controllers
             }
 
         }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteCategoryAsync([FromRoute] string id)
+        {
+            try
+            { 
+                var result = await _categoryService.DeleteCategoryAsync(id);
+                if (result.Success)
+                {
+                    return Ok(result);
+                }
+                return result.ErrorCode switch
+                {
+                    CategoryErrorCode.CategoryNotFound => NotFound(result),
+                    CategoryErrorCode.InvalidData => Unauthorized(result),
+                    CategoryErrorCode.EmptyFields => BadRequest(result),
+                    _ => BadRequest(result)
+                };
+
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"Error:: {e.Message}");
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateCategoryAsync([FromRoute] string id, [FromBody] UpdateCategoryRequestDto updateCategoryRequestDto)
+        {
+            try
+            {
+                var result = await _categoryService.UpdateCategoryAsync(id, updateCategoryRequestDto);
+                if (result.Success)
+                {
+                    return Ok(result);
+                }
+                return result.ErrorCode switch
+                {
+                    CategoryErrorCode.CategoryNotFound => NotFound(result),
+                    CategoryErrorCode.InvalidData => Unauthorized(result),
+                    CategoryErrorCode.EmptyFields => BadRequest(result),
+                    _ => BadRequest(result)
+                };
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"Error:: {e.Message}");
+            }
+        }
     }
 }
+ 

@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using static ServiceLog.Enums.CategoryErrorCodes;
 using System.Text.Json.Serialization;
+using MongoDB.Bson.Serialization.Attributes;
+using static ServiceLog.Enums.AuthErrorCodes;
+using static ServiceLog.Enums.CategoryErrorCodes;
 
 namespace ServiceLog.Models.Dto.CategoryDto
 {
-    public class NewCategoryResponseDto
+    public class DeleteCategoryResponseDto
     {
         [Required]
         public bool Success { get; set; }

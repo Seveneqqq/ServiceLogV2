@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using static ServiceLog.Enums.AuthErrorCodes;
 
 namespace ServiceLog.Models.Dto
 {
@@ -12,5 +13,7 @@ namespace ServiceLog.Models.Dto
         [Required]
         public bool Success { get; set; } = false;
         public string? Message { get; set; } = "Login failed. Please try again.";
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public AuthErrorCode ErrorCode { get; set; } = AuthErrorCode.None;
     }
 }

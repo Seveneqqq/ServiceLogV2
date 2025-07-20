@@ -8,12 +8,24 @@ namespace ServiceLog.Models.Domain
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
-        public DateTime Date { get; set; }
-        public string DeviceId { get; set; }                  
+        [BsonElement("created_at")]
+        [BsonRequired]
+        public DateTime Date { get; set; } = DateTime.UtcNow;
+        [BsonElement("device_id")]
+        [BsonRequired]
+        public string DeviceId { get; set; } 
+        [BsonElement("technican_id")]
+        [BsonRequired]
         public string TechnicanId { get; set; }
+        [BsonElement("ticket_id")]
+        [BsonRequired]
         public string TicketId { get; set; }
-        public string? OtherInformations { get; set; } 
-        public string IssueDescription { get; set; }  
-        public List<ServiceOption>? ServiceOptions { get; set; }
+        [BsonElement("issue_description")]
+        [BsonRequired]
+        public string IssueDescription { get; set; }
+        [BsonElement("other_informations")]
+        public string? OtherInformations { get; set; }
+        [BsonElement("performed_service_options")]
+        public List<ServiceOption>? PerformedServiceOptions { get; set; }
     }
 }

@@ -30,8 +30,8 @@ namespace ServiceLog.Models.Domain
         [BsonElement("status_history")]
         public List<StatusHistoryEntry> StatusHistory { get; set; } = new List<StatusHistoryEntry>();
 
-        [BsonElement("technicant_id")]
-        public string TechnicantId { get; set; }
+        [BsonElement("technican_id")]
+        public string TechnicanId { get; set; }
 
         [BsonElement("receiving_method")]
         public string ReceivingMethod { get; set; }
@@ -48,7 +48,7 @@ namespace ServiceLog.Models.Domain
         [BsonElement("date")]
         public DateTime Date { get; set; }
 
-        [BsonElement("technicant_id")]
-        public string TechnicantId { get; set; }
+        [BsonElement("technican_id")]
+        public string TechnicanId { get; set; }
     }
 }

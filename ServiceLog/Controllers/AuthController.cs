@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ServiceLog.Models.Dto;
 using ServiceLog.Services.interfaces;
+using static ServiceLog.Enums.AuthErrorCodes;
 
 namespace ServiceLog.Controllers
 {
@@ -43,6 +44,7 @@ namespace ServiceLog.Controllers
             }
            
         }
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
@@ -60,12 +62,14 @@ namespace ServiceLog.Controllers
                     });
                     return Ok(result);
                 }
-                else if(!result.Success && result.Message.Equals("User doesn't exists."))
-                {
-                    return NotFound(result);
-                }
 
-                   return Unauthorized(result);
+                return result.ErrorCode switch
+                {
+                    AuthErrorCode.UserNotFound => NotFound(result),
+                    AuthErrorCode.InvalidPassword => Unauthorized(result),
+                    AuthErrorCode.EmptyFields => BadRequest(result),
+                    _ => BadRequest(result)
+                };
             }
             catch (Exception e)
             {

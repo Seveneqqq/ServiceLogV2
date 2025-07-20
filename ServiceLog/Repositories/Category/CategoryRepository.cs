@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
 using ServiceLog.Data;
 using ServiceLog.Models.Domain;
 
@@ -20,7 +21,8 @@ namespace ServiceLog.Repositories.CategoryRepository
 
         public async Task<DeleteResult> DeleteCategoryAsync(string id)
         {
-            return await _mongoDbContext.Categories.DeleteOneAsync(id);   
+            var filter = Builders<Category>.Filter.Eq("_id", new ObjectId(id));
+            return await _mongoDbContext.Categories.DeleteOneAsync(filter);
         }
 
         public async Task<List<Category>> GetAllCategoriesAsync()
@@ -33,15 +35,9 @@ namespace ServiceLog.Repositories.CategoryRepository
             return await _mongoDbContext.Categories.Find(c => c.Id == id).FirstOrDefaultAsync();
         }
 
-        public async Task<Category> UpdateCategoryAsync(string id, Category category)
+        public async Task<ReplaceOneResult> UpdateCategoryAsync(string id, Category category)
         {
-            return await _mongoDbContext.Categories.FindOneAndReplaceAsync(
-                c => c.Id == id,
-                category,
-                new FindOneAndReplaceOptions<Category>
-                {
-                    ReturnDocument = ReturnDocument.After
-                });
+            return await _mongoDbContext.Categories.ReplaceOneAsync(x => x.Id == id, category);
         }
     }
 }

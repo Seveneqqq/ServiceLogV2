@@ -12,5 +12,6 @@ namespace ServiceLog.Models.Dto
         [Required]
         public bool Success { get; set; } = false;
         public string? Message { get; set; } = "Registration failed. Please try again.";
+
     }
 }

@@ -9,7 +9,7 @@ namespace ServiceLog.Repositories.CategoryRepository
         Task<List<Category>> GetAllCategoriesAsync();
         Task<Category> GetCategoryByIdAsync(string id);
         Task CreateCategoryAsync(Category category);
-        Task<Category> UpdateCategoryAsync(string id, Category category);
+        Task<ReplaceOneResult> UpdateCategoryAsync(string id, Category category);
         Task<DeleteResult> DeleteCategoryAsync(string id);
         //Task<List<Category>> GetCategoriesByServiceOptionAsync(string serviceOption);
     }
