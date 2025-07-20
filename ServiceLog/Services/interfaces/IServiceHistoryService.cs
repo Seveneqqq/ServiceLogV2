@@ -1,9 +1,9 @@
 ﻿using MongoDB.Driver;
 using ServiceLog.Models.Domain;
 
-namespace ServiceLog.Repositories.ServiceHistoryRepository
+namespace ServiceLog.Services.interfaces
 {
-    public interface IServiceHistoryRepository
+    public interface IServiceHistoryService
     {
         Task CreateServiceHistoryAsync(ServiceHistory serviceHistory);
         Task<List<ServiceHistory>> GetAllServiceHistoriesAsync();

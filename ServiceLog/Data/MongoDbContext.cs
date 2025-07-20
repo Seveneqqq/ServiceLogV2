@@ -31,7 +31,7 @@ namespace ServiceLog.Data
         }
 
         public IMongoCollection<Category> Categories => _database.GetCollection<Category>("Category");
-        public IMongoCollection<Service_history> ServiceHistories => _database.GetCollection<Service_history>("service_histories");
-        public IMongoCollection<Ticket> Tickets => _database.GetCollection<Ticket>("tickets");
+        public IMongoCollection<ServiceHistory> ServiceHistories => _database.GetCollection<ServiceHistory>("ServiceHistory");
+        public IMongoCollection<Ticket> Tickets => _database.GetCollection<Ticket>("Ticket");
     }
 }

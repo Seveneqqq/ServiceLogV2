@@ -5,12 +5,12 @@ using ServiceLog.Services;
 
 namespace ServiceLog.Tests.Unit.tests.Services.CategoryServiceTests
 {
-    public class GetCategoryAsyncTests
+    public class GetCategoryByIdAsyncTests
     {
         private readonly Mock<ICategoryRepository> _categoryRepositoryMock;
         private readonly CategoryService _categoryService;
 
-        public GetCategoryAsyncTests()
+        public GetCategoryByIdAsyncTests()
         {
             _categoryRepositoryMock = new Mock<ICategoryRepository>();
             _categoryService = new CategoryService(_categoryRepositoryMock.Object);

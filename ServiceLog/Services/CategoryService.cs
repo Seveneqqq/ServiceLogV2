@@ -124,7 +124,7 @@ namespace ServiceLog.Services
             }
             }
 
-        public async Task<UpdateCategoryResponseDto> UpdateCategoryAsync(string id, UpdateCategoryRequestDto updateCategoryRequestDto)
+            public async Task<UpdateCategoryResponseDto> UpdateCategoryAsync(string id, UpdateCategoryRequestDto updateCategoryRequestDto)
         {
             try
             {
