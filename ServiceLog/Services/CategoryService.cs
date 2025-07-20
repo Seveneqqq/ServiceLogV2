@@ -91,6 +91,7 @@ namespace ServiceLog.Services
             
             try
             {
+              
                 var result = await _categoryRepository.DeleteCategoryAsync(id);
                 
                 if(result.DeletedCount > 0)
@@ -155,10 +156,13 @@ namespace ServiceLog.Services
                         ErrorCode = CategoryErrorCode.CategoryNotFound
                     };
                 }
+
                 existingCategory.Name = updateCategoryRequestDto.Name;
                 existingCategory.Description = updateCategoryRequestDto.Description;
                 existingCategory.ServiceOptions = updateCategoryRequestDto.ServiceOptions;
+
                 var updatedCategory = await _categoryRepository.UpdateCategoryAsync(id, existingCategory);
+
                 return new UpdateCategoryResponseDto
                 {
                     Success = true,
