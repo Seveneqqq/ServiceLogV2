@@ -88,21 +88,11 @@ namespace ServiceLog.Services
                     ErrorCode = CategoryErrorCode.EmptyFields
                 };
             }
-            
+
             try
             {
-              
-                var result = await _categoryRepository.DeleteCategoryAsync(id);
-                
-                if(result.DeletedCount > 0)
-                {
-                    return new DeleteCategoryResponseDto
-                    {
-                        Success = true,
-                        Message = "Category deleted successfully."
-                    };
-                }
-                else
+                var existingCategory = await _categoryRepository.GetCategoryByIdAsync(id);
+                if (existingCategory == null)
                 {
                     return new DeleteCategoryResponseDto
                     {
@@ -111,7 +101,12 @@ namespace ServiceLog.Services
                         ErrorCode = CategoryErrorCode.CategoryNotFound
                     };
                 }
-
+                await _categoryRepository.DeleteCategoryAsync(id);
+                return new DeleteCategoryResponseDto
+                {
+                    Success = true,
+                    Message = "Category deleted successfully."
+                };
             }
             catch (Exception e)
             {

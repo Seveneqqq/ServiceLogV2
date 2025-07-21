@@ -75,22 +75,122 @@ namespace ServiceLog.Services
             }
         }
 
-        public async Task<DeleteResult> DeleteServiceHistoryAsync(string id)
+        public async Task<ServiceHistoryResponseDto> DeleteServiceHistoryAsync(string id)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(id))
+            {
+                return new ServiceHistoryResponseDto
+                {
+                    Success = false,
+                    Message = "Service history ID cannot be null or empty.",
+                    ErrorCode = ServiceHistoryErrorCode.EmptyFields
+                };
+            }
+            try
+            {
+                var serviceHistory = await _serviceHistoryRepository.GetServiceHistoryByIdAsync(id);
+                if (serviceHistory == null)
+                {
+                    return new ServiceHistoryResponseDto
+                    {
+                        Success = false,
+                        Message = "Service history not found.",
+                        ErrorCode = ServiceHistoryErrorCode.ServiceHistoryNotFound
+                    };
+                }
+                await _serviceHistoryRepository.DeleteServiceHistoryAsync(id);
+                return new ServiceHistoryResponseDto
+                {
+                    Success = true,
+                    Message = "Service history deleted successfully."
+                };
+            }
+            catch (Exception e)
+            {
+                return new ServiceHistoryResponseDto
+                {
+                    Success = false,
+                    Message = $"Error deleting service history: {e.Message}",
+                    ErrorCode = ServiceHistoryErrorCode.Unknown
+                };
+            }
         }
 
-        public async Task<List<ServiceHistory>> GetAllServiceHistoriesAsync()
+        public async Task<GetAllServiceHistoriesResposneDto> GetAllServiceHistoriesAsync()
         {
-            throw new NotImplementedException();
+            try
+            {
+                var serviceHistories = await _serviceHistoryRepository.GetAllServiceHistoriesAsync();
+                if (serviceHistories == null || !serviceHistories.Any())
+                {
+                    return new GetAllServiceHistoriesResposneDto
+                    {
+                        Success = false,
+                        Message = "No service histories found.",
+                        ErrorCode = ServiceHistoryErrorCode.ServiceHistoryNotFound
+                    };
+                }
+                return new GetAllServiceHistoriesResposneDto
+                {
+                    Success = true,
+                    Message = "Service histories retrieved successfully.",
+                    ServiceHistories = serviceHistories
+                };
+
+            }
+            catch (Exception e)
+            {
+                return new GetAllServiceHistoriesResposneDto
+                {
+                    Success = false,
+                    Message = $"Error retrieving service histories: {e.Message}",
+                    ErrorCode = ServiceHistoryErrorCode.Unknown
+                };
+            }
         }
 
-        public async Task<ServiceHistory> GetServiceHistoryByIdAsync(string id)
+        public async Task<GetByIdServiceHistoryResponseDto> GetServiceHistoryByIdAsync(string id)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(id))
+            {
+                return new GetByIdServiceHistoryResponseDto
+                {
+                    Success = false,
+                    Message = "Service history ID cannot be null or empty.",
+                    ErrorCode = ServiceHistoryErrorCode.EmptyFields
+                };
+            }
+            try
+            {
+                var serviceHistory = await _serviceHistoryRepository.GetServiceHistoryByIdAsync(id);
+                if (serviceHistory == null)
+                {
+                    return new GetByIdServiceHistoryResponseDto
+                    {
+                        Success = false,
+                        Message = "Service history not found.",
+                        ErrorCode = ServiceHistoryErrorCode.ServiceHistoryNotFound
+                    };
+                }
+                return new GetByIdServiceHistoryResponseDto
+                {
+                    Success = true,
+                    Message = "Service history retrieved successfully.",
+                    ServiceHistory = serviceHistory
+                };
+            }
+            catch (Exception e)
+            {
+                return new GetByIdServiceHistoryResponseDto
+                {
+                    Success = false,
+                    Message = $"Error retrieving service history: {e.Message}",
+                    ErrorCode = ServiceHistoryErrorCode.Unknown
+                };
+            }
         }
 
-        public async Task<ReplaceOneResult> UpdateServiceHistoryAsync(string id, ServiceHistory serviceHistory)
+        public Task<ServiceHistoryResponseDto> UpdateServiceHistoryAsync(string id, UpdateServiceHistoryRequestDto updateServiceHistoryRequestDto)
         {
             throw new NotImplementedException();
         }

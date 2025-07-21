@@ -23,6 +23,7 @@
     <Folder Include="Functional.tests\" />
     <Folder Include="Integration.tests\" />
     <Folder Include="Unit.tests\Repositories\" />
+    <Folder Include="Unit.tests\Services\ServiceHistoryService.Tests\" />
   </ItemGroup>
 
   <ItemGroup>
