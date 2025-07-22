@@ -30,7 +30,6 @@
   <ItemGroup>
     <Folder Include="https\" />
     <Folder Include="Logs\" />
-    <Folder Include="Models\Dto\ServiceHistoryDto\" />
   </ItemGroup>
 
 </Project>

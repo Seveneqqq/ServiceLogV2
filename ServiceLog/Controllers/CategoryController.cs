@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ServiceLog.Models.Dto.CategoryDto;
 using ServiceLog.Services.interfaces;
-using static ServiceLog.Enums.AuthErrorCodes;
 using static ServiceLog.Enums.CategoryErrorCodes;
 
 namespace ServiceLog.Controllers

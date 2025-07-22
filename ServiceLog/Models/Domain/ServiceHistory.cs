@@ -9,7 +9,6 @@ namespace ServiceLog.Models.Domain
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
         [BsonElement("created_at")]
-        [BsonRequired]
         public DateTime Date { get; set; } = DateTime.UtcNow;
         [BsonElement("device_id")]
         [BsonRequired]
@@ -26,6 +25,7 @@ namespace ServiceLog.Models.Domain
         [BsonElement("other_informations")]
         public string? OtherInformations { get; set; }
         [BsonElement("performed_service_options")]
+        [BsonRequired]
         public List<ServiceOption>? PerformedServiceOptions { get; set; }
     }
 }
