@@ -190,9 +190,64 @@ namespace ServiceLog.Services
             }
         }
 
-        public Task<ServiceHistoryResponseDto> UpdateServiceHistoryAsync(string id, UpdateServiceHistoryRequestDto updateServiceHistoryRequestDto)
+        public async Task<ServiceHistoryResponseDto> UpdateServiceHistoryAsync(string id, UpdateServiceHistoryRequestDto updateServiceHistoryRequestDto)
         {
-            throw new NotImplementedException();
+            if (updateServiceHistoryRequestDto == null)
+            {
+                return new ServiceHistoryResponseDto
+                {
+                    Success = false,
+                    Message = "Request data is null.",
+                    ErrorCode = ServiceHistoryErrorCode.EmptyFields
+                };
+            }
+
+            if (!string.IsNullOrEmpty(id)) {
+                return new ServiceHistoryResponseDto
+                {
+                    Success = false,
+                    Message = "Service history ID cannot be null or empty.",
+                    ErrorCode = ServiceHistoryErrorCode.EmptyFields
+                };
+            }
+
+            try
+            {
+                var serviceHistory = await _serviceHistoryRepository.GetServiceHistoryByIdAsync(id);
+                if (serviceHistory == null)
+                {
+                    return new ServiceHistoryResponseDto
+                    {
+                        Success = false,
+                        Message = "Service history not found.",
+                        ErrorCode = ServiceHistoryErrorCode.ServiceHistoryNotFound
+                    };
+                }
+
+                serviceHistory.IssueDescription = updateServiceHistoryRequestDto.IssueDescription ?? serviceHistory.IssueDescription;
+                serviceHistory.OtherInformations = updateServiceHistoryRequestDto.OtherInformations ?? serviceHistory.OtherInformations;
+                serviceHistory.TicketId = updateServiceHistoryRequestDto.TicketId ?? serviceHistory.TicketId;
+                serviceHistory.TechnicanId = updateServiceHistoryRequestDto.TechnicanId ?? serviceHistory.TechnicanId;
+                serviceHistory.DeviceId = updateServiceHistoryRequestDto.DeviceId ?? serviceHistory.DeviceId;
+                serviceHistory.PerformedServiceOptions = updateServiceHistoryRequestDto.PerformedServiceOptions ?? serviceHistory.PerformedServiceOptions;
+                
+                await _serviceHistoryRepository.UpdateServiceHistoryAsync(id, serviceHistory);
+                
+                return new ServiceHistoryResponseDto
+                {
+                    Success = true,
+                    Message = "Service history updated successfully."
+                };
+            }
+            catch(Exception e)
+            {
+                return new ServiceHistoryResponseDto
+                {
+                    Success = false,
+                    Message = $"Error updating service history: {e.Message}",
+                    ErrorCode = ServiceHistoryErrorCode.Unknown
+                };
+            }
         }
     }
 }
