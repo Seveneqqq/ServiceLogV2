@@ -7,7 +7,7 @@
         public string Serial_number { get; set; }
         public string Designation { get; set; }
         public string? Location { get; set; }
-        public Guid Category_id { get; set; }
+        public string Category_id { get; set; }
         public string Status { get; set; }
     }
 }
