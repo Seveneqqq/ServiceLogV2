@@ -35,6 +35,93 @@ namespace ServiceLog.Controllers
             catch (Exception e)
             {
                 return StatusCode(500, $"Error:: {e.Message}");
+            }   
+        }
+        [HttpGet("")]
+        public async Task<IActionResult> GetAllServiceHistoriesAsync()
+        {
+            try
+            {
+                var result = await _serviceHistoryService.GetAllServiceHistoriesAsync();
+                if (result.Success)
+                {
+                    return Ok(result);
+                }
+
+                return result.ErrorCode switch
+                {
+                    ServiceHistoryErrorCode.ServiceHistoryNotFound => NotFound(result),
+                    _ => BadRequest(result)
+                };
+
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"Error:: {e.Message}");
+            }
+        }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetServiceHistoryByIdAsync(string id)
+        {
+            try
+            {
+                var result = await _serviceHistoryService.GetServiceHistoryByIdAsync(id);
+                if (result.Success)
+                {
+                    return Ok(result);
+                }
+                return result.ErrorCode switch
+                {
+                    ServiceHistoryErrorCode.ServiceHistoryNotFound => NotFound(result),
+                    _ => BadRequest(result)
+                };
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"Error:: {e.Message}");
+            }
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteServiceHistoryAsync(string id)
+        {
+            try
+            {
+                var result = await _serviceHistoryService.DeleteServiceHistoryAsync(id);
+                if (result.Success)
+                {
+                    return Ok(result);
+                }
+                return result.ErrorCode switch
+                {
+                    ServiceHistoryErrorCode.ServiceHistoryNotFound => NotFound(result),
+                    _ => BadRequest(result)
+                };
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"Error:: {e.Message}");
+            }
+        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateServiceHistoryAsync(string id, [FromBody] UpdateServiceHistoryRequestDto updateServiceHistoryRequestDto)
+        {
+            try
+            {
+                var result = await _serviceHistoryService.UpdateServiceHistoryAsync(id, updateServiceHistoryRequestDto);
+                if (result.Success)
+                {
+                    return Ok(result);
+                }
+                return result.ErrorCode switch
+                {
+                    ServiceHistoryErrorCode.ServiceHistoryNotFound => NotFound(result),
+                    ServiceHistoryErrorCode.InvalidData => BadRequest(result),
+                    _ => BadRequest(result)
+                };
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"Error:: {e.Message}");
             }
         }
     }

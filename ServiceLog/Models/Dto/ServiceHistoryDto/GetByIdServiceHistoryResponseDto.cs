@@ -12,7 +12,7 @@ namespace ServiceLog.Models.Dto.ServiceHistoryDto
         [Required]
         public string Message { get; set; } = string.Empty;
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public ServiceHistory ServiceHistory { get; set; };
+        public ServiceHistory ServiceHistory { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ServiceHistoryErrorCode ErrorCode { get; set; } = ServiceHistoryErrorCode.None;
     }
