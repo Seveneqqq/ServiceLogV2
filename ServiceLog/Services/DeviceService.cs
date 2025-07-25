@@ -1,4 +1,5 @@
 ﻿using ServiceLog.Enums;
+using ServiceLog.Helpers;
 using ServiceLog.Models.Domain;
 using ServiceLog.Models.Dto.DeviceDto;
 using ServiceLog.Repositories.DeviceRepository;
@@ -11,6 +12,7 @@ namespace ServiceLog.Services
     {
         private readonly IDeviceRepository _deviceRepository;
         private readonly ICategoryService _categoryService;
+
         public DeviceService(IDeviceRepository deviceRepository, ICategoryService categoryService)
         {
             _deviceRepository = deviceRepository;
@@ -26,7 +28,7 @@ namespace ServiceLog.Services
             var category = await _categoryService.GetCategoryByIdAsync(categoryId);
             return category != null && category.Success;
         }
-
+     
         public async Task<NewDeviceResponseDto> CreateDeviceAsync(NewDeviceRequestDto newDeviceRequestDto)
         {
             if(newDeviceRequestDto == null)
@@ -62,7 +64,8 @@ namespace ServiceLog.Services
             try
             {
                 Device device = new Device { 
-                    Status = newDeviceRequestDto.Status, 
+                    Status = newDeviceRequestDto.Status,
+                    Short_id = ShortCodeGenerator.GenerateShortId(),
                     SerialNumber = newDeviceRequestDto.SerialNumber, 
                     Designation = newDeviceRequestDto.Designation, 
                     Location = newDeviceRequestDto.Location, 
@@ -94,7 +97,7 @@ namespace ServiceLog.Services
                 return new NewDeviceResponseDto
                 {
                     Success = false,
-                    Message = $"An error occurred while creating the device: {ex.Message}",
+                    Message = $"An error occurred while creating the device: {ex.Message} {ex.InnerException}",
                     ErrorCode = DeviceErrorCode.Unknown
                 };
             }

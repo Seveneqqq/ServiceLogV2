@@ -82,7 +82,11 @@ builder.Services.Configure<MongoSettings>(builder.Configuration.GetSection("Mong
 builder.Services.AddSingleton<MongoDbContext>();
 
 builder.Services.AddDbContext<SqlDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnectionString")));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("SqlConnectionString"),
+        sqlOptions => sqlOptions.EnableRetryOnFailure()
+    ));
+
 
 //repository registration
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -94,9 +98,16 @@ builder.Services.AddScoped<IServiceHistoryService, ServiceHistoryService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IDeviceService, DeviceService>();
 
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<SqlDbContext>();
+    db.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline
 app.UseSwagger();
