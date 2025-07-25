@@ -1,5 +1,5 @@
 ﻿using ServiceLog.Models.Dto.DeviceDto;
-using ServiceLog.Repositories.DeviceRepository;
+using ServiceLog.Repositories.Device;
 using ServiceLog.Services.interfaces;
 
 namespace ServiceLog.Services
@@ -7,9 +7,11 @@ namespace ServiceLog.Services
     public class DeviceService : IDeviceService
     {
         private readonly IDeviceRepository _deviceRepository;
-        public DeviceService(IDeviceRepository deviceRepository)
+        private readonly ICategoryService _categoryService;
+        public DeviceService(IDeviceRepository deviceRepository, ICategoryService categoryService)
         {
             _deviceRepository = deviceRepository;
+            _categoryService = categoryService;
         }
 
         public Task<NewDeviceResponseDto> CreateDeviceAsync(NewDeviceRequestDto newDeviceRequestDto)
