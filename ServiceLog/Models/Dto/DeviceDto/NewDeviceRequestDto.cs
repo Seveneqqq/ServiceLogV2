@@ -7,10 +7,14 @@ namespace ServiceLog.Models.Dto.DeviceDto
     public class NewDeviceRequestDto
     {
         [Required]
-        public bool Success { get; set; }
+        public string SerialNumber { get; set; }
         [Required]
-        public string Message { get; set; }
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public DeviceErrorCode ErrorCode { get; set; } = DeviceErrorCode.None;
+        public string Designation { get; set; }
+        public string Location { get; set; }
+        [Required]
+        public string CategoryId { get; set; }
+        [Required]
+        [AllowedValues("Active", "Not-active", "In-repair", "Waiting-to-repair", "Unknown")]
+        public string Status { get; set; } = "Active";
     }
 }
