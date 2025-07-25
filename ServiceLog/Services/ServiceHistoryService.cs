@@ -12,10 +12,12 @@ namespace ServiceLog.Services
     {
 
         private readonly IServiceHistoryRepository _serviceHistoryRepository;
+        private readonly ICategoryService _categoryService;
 
-        public ServiceHistoryService(IServiceHistoryRepository serviceHistoryRepository)
+        public ServiceHistoryService(IServiceHistoryRepository serviceHistoryRepository, ICategoryService categoryService)
         {
             _serviceHistoryRepository = serviceHistoryRepository;
+            _categoryService = categoryService;
         }
 
         //Todo: Dodanie sprawdzenia czy akcja serwisowa istnieje w kategorii, jeżeli nie to zwrócenie błędu

@@ -10,6 +10,7 @@ using ServiceLog.Services;
 using ServiceLog.Middlewares;
 using ServiceLog.Repositories.CategoryRepository;
 using ServiceLog.Repositories.ServiceHistoryRepository;
+using ServiceLog.Repositories.DeviceRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -80,16 +81,20 @@ builder.Services.AddDbContext<AuthDbContext>(options =>
 builder.Services.Configure<MongoSettings>(builder.Configuration.GetSection("MongoSettings"));
 builder.Services.AddSingleton<MongoDbContext>();
 
+builder.Services.AddDbContext<SqlDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnectionString")));
+
 //repository registration
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IServiceHistoryRepository, ServiceHistoryRepository>();
-
+builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
 
 //service registration
 builder.Services.AddScoped<IServiceHistoryService, ServiceHistoryService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+
 
 var app = builder.Build();
 
