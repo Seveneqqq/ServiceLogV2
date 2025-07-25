@@ -1,4 +1,5 @@
-﻿using ServiceLog.Repositories.DeviceRepository;
+﻿using ServiceLog.Models.Dto.DeviceDto;
+using ServiceLog.Repositories.DeviceRepository;
 using ServiceLog.Services.interfaces;
 
 namespace ServiceLog.Services
