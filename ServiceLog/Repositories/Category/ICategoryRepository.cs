@@ -11,6 +11,5 @@ namespace ServiceLog.Repositories.CategoryRepository
         Task CreateCategoryAsync(Category category);
         Task<ReplaceOneResult> UpdateCategoryAsync(string id, Category category);
         Task<DeleteResult> DeleteCategoryAsync(string id);
-        //Task<List<Category>> GetCategoriesByServiceOptionAsync(string serviceOption);
     }
 }

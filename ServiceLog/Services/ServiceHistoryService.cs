@@ -12,11 +12,15 @@ namespace ServiceLog.Services
     {
 
         private readonly IServiceHistoryRepository _serviceHistoryRepository;
+        private readonly ICategoryService _categoryService;
 
-        public ServiceHistoryService(IServiceHistoryRepository serviceHistoryRepository)
+        public ServiceHistoryService(IServiceHistoryRepository serviceHistoryRepository, ICategoryService categoryService)
         {
             _serviceHistoryRepository = serviceHistoryRepository;
+            _categoryService = categoryService;
         }
+
+        //Todo: Dodanie sprawdzenia czy akcja serwisowa istnieje w kategorii, jeżeli nie to zwrócenie błędu
 
         public async Task<CreateServiceHistoryResponseDto> CreateServiceHistoryAsync(CreateServiceHistoryRequestDto createServiceHistoryRequestDto)
         {
@@ -190,6 +194,7 @@ namespace ServiceLog.Services
             }
         }
 
+        //Todo: Dodanie sprawdzenia czy akcja serwisowa istnieje w kategorii, jeżeli nie to zwrócenie błędu
         public async Task<ServiceHistoryResponseDto> UpdateServiceHistoryAsync(string id, UpdateServiceHistoryRequestDto updateServiceHistoryRequestDto)
         {
             if (updateServiceHistoryRequestDto == null)
