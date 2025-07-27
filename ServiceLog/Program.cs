@@ -100,6 +100,9 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IDeviceService, DeviceService>();
 
+//Todo: Add rate limiting
+//Todo: Configure Endpoint access by roles
+//Todo: Add Paginations and Filtering
 
 var app = builder.Build();
 
