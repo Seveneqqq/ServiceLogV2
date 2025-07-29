@@ -13,11 +13,13 @@ namespace ServiceLog.Services
 
         private readonly IServiceHistoryRepository _serviceHistoryRepository;
         private readonly ICategoryService _categoryService;
+        private readonly IDeviceService _deviceService;
 
-        public ServiceHistoryService(IServiceHistoryRepository serviceHistoryRepository, ICategoryService categoryService)
+        public ServiceHistoryService(IServiceHistoryRepository serviceHistoryRepository, ICategoryService categoryService, IDeviceService deviceService)
         {
             _serviceHistoryRepository = serviceHistoryRepository;
             _categoryService = categoryService;
+            _deviceService = deviceService;
         }
 
         //Todo: Dodanie sprawdzenia czy akcja serwisowa istnieje w kategorii, jeżeli nie to zwrócenie błędu
@@ -48,6 +50,35 @@ namespace ServiceLog.Services
                         Message = "Required fields are missing",
                         ErrorCode = ServiceHistoryErrorCode.EmptyFields
                     };
+                }
+
+                var deviceResult = await _deviceService.GetDeviceByIdAsync(createServiceHistoryRequestDto.DeviceId);
+                if(deviceResult != null && !deviceResult.Success)
+                {
+                    return new CreateServiceHistoryResponseDto
+                    {
+                        Success = false,
+                        Message = "Device not found.",
+                        ErrorCode = ServiceHistoryErrorCode.InvalidData
+                    };
+                }
+                else
+                {
+                    var categoryResult = await _categoryService.GetCategoryByIdAsync(deviceResult.Device.CategoryId);
+
+                    foreach(var serviceOption in createServiceHistoryRequestDto.PerformedServiceOptions)
+                    {
+                        if (!categoryResult.Category.ServiceOptions.Any(x => x.Name == serviceOption.Name))
+                        {
+                            return new CreateServiceHistoryResponseDto
+                            {
+                                Success = false,
+                                Message = "Performed service option does not exist in the category.",
+                                ErrorCode = ServiceHistoryErrorCode.InvalidData
+                            };
+                        }
+                    }
+
                 }
 
                 ServiceHistory serviceHistory = new ServiceHistory
@@ -207,7 +238,7 @@ namespace ServiceLog.Services
                 };
             }
 
-            if (!string.IsNullOrEmpty(id)) {
+            if (string.IsNullOrEmpty(id)) {
                 return new ServiceHistoryResponseDto
                 {
                     Success = false,

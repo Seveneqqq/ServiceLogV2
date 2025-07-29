@@ -39,5 +39,51 @@ namespace ServiceLog.Controllers
             }
         }
 
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteDeviceAsync([FromRoute] string id)
+        {
+            try
+            {
+                var result = await _deviceService.DeleteDeviceAsync(id);
+                if (result.Success)
+                {
+                    return Ok(result);
+                }
+                return result.ErrorCode switch
+                {
+                    DeviceErrorCode.DeviceNotFound => NotFound(result),
+                    DeviceErrorCode.InvalidData => Unauthorized(result),
+                    DeviceErrorCode.EmptyFields => BadRequest(result),
+                    _ => BadRequest(result)
+                };
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"Error:: {e.Message}");
+            }
+        }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetDeviceByIdAsync([FromRoute] string id)
+        {
+            try
+            {
+                var result = await _deviceService.GetDeviceByIdAsync(id);
+                if (result.Success)
+                {
+                    return Ok(result);
+                }
+                return result.ErrorCode switch
+                {
+                    DeviceErrorCode.DeviceNotFound => NotFound(result),
+                    DeviceErrorCode.InvalidData => Unauthorized(result),
+                    DeviceErrorCode.EmptyFields => BadRequest(result),
+                    _ => BadRequest(result)
+                };
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"Error:: {e.Message}");
+            }
+        }
     }
 }

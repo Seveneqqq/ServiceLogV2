@@ -103,9 +103,60 @@ namespace ServiceLog.Services
             }
         }
 
-        public Task<DeleteDeviceResponseDto> DeleteDeviceAsync(string id)
+        public async Task<DeleteDeviceResponseDto> DeleteDeviceAsync(string id)
         {
-            throw new NotImplementedException();
+            if(string.IsNullOrEmpty(id))
+            {
+                return new DeleteDeviceResponseDto
+                {
+                    Success = false,
+                    Message = "Device ID cannot be null or empty.",
+                    ErrorCode = DeviceErrorCode.EmptyFields
+                };
+            }
+
+            try
+            {
+                if (!Guid.TryParse(id, out Guid guidId))
+                {
+                    return new DeleteDeviceResponseDto
+                    {
+                        Success = false,
+                        Message = "Invalid Device ID format.",
+                        ErrorCode = DeviceErrorCode.InvalidData
+                    };
+                }
+
+                var device = await _deviceRepository.GetDeviceByIdAsync(guidId);
+
+                if (device == null)
+                {
+                    return new DeleteDeviceResponseDto
+                    {
+                        Success = false,
+                        Message = "Device not found.",
+                        ErrorCode = DeviceErrorCode.DeviceNotFound
+                    };
+                }
+
+                await _deviceRepository.DeleteDeviceAsync(device.Id);
+
+                    return new DeleteDeviceResponseDto
+                    {
+                        Success = true,
+                        Message = "Device deleted successfully."
+                    };
+            }
+            catch (Exception ex)
+            {
+                return new DeleteDeviceResponseDto
+                {
+                    Success = false,
+                    Message = $"An error occurred while deleting the device: {ex.Message} {ex.InnerException}",
+                    ErrorCode = DeviceErrorCode.Unknown
+                };
+            }
+
         }
 
         public Task<GetAllDeviceResponseDto> GetAllDevicesAsync()
@@ -113,9 +164,54 @@ namespace ServiceLog.Services
             throw new NotImplementedException();
         }
 
-        public Task<GetByIdDeviceResponseDto> GetDeviceByIdAsync(string id)
+        public async Task<GetByIdDeviceResponseDto> GetDeviceByIdAsync(string id)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(id))
+            {
+                return new GetByIdDeviceResponseDto
+                {
+                    Success = false,
+                    Message = "Device ID cannot be null or empty.",
+                    ErrorCode = DeviceErrorCode.EmptyFields
+                };
+            }
+            if (!Guid.TryParse(id, out Guid guidId))
+            {
+                return new GetByIdDeviceResponseDto
+                {
+                    Success = false,
+                    Message = "Invalid Device ID format.",
+                    ErrorCode = DeviceErrorCode.InvalidData
+                };
+            }
+            try
+            {
+                var device = await _deviceRepository.GetDeviceByIdAsync(guidId);
+                if (device == null)
+                {
+                    return new GetByIdDeviceResponseDto
+                    {
+                        Success = false,
+                        Message = "Device not found.",
+                        ErrorCode = DeviceErrorCode.DeviceNotFound
+                    };
+                }
+                return new GetByIdDeviceResponseDto
+                {
+                    Success = true,
+                    Message = "Device retrieved successfully.",
+                    Device = device
+                };
+            }
+            catch (Exception ex)
+            {
+                return new GetByIdDeviceResponseDto
+                {
+                    Success = false,
+                    Message = $"An error occurred while retrieving the device: {ex.Message} {ex.InnerException}",
+                    ErrorCode = DeviceErrorCode.Unknown
+                };
+            }
         }
 
         public Task<UpdateDeviceResponseDto> UpdateDeviceAsync(string id, UpdateDeviceRequestDto updateDeviceRequestDto)
