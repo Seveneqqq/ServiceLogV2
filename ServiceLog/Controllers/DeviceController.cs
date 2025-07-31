@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ServiceLog.Filters;
 using ServiceLog.Models.Dto.DeviceDto;
 using ServiceLog.Services.interfaces;
 using static ServiceLog.Enums.DeviceErrorCodes;
@@ -86,6 +87,28 @@ namespace ServiceLog.Controllers
                 return StatusCode(500, $"Error:: {e.Message}");
             }
         }
-
+        [HttpGet("")]
+        public async Task<IActionResult> GetAllDevicesAsync([FromQuery] DeviceFilter? deviceFilter)
+        {
+            try
+            {
+                var result = await _deviceService.GetAllDevicesAsync(deviceFilter);
+                if (result.Success)
+                {
+                    return Ok(result);
+                }
+                return result.ErrorCode switch
+                {
+                    DeviceErrorCode.DeviceNotFound => NotFound(result),
+                    DeviceErrorCode.InvalidData => Unauthorized(result),
+                    DeviceErrorCode.EmptyFields => BadRequest(result),
+                    _ => BadRequest(result)
+                };
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"Error:: {e.Message}");
+            }
+        }
     }
 }
