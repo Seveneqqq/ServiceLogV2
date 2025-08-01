@@ -1,4 +1,5 @@
 ﻿using MongoDB.Driver;
+using ServiceLog.Filters;
 using ServiceLog.Models.Domain;
 using ServiceLog.Models.Dto.CategoryDto;
 using ServiceLog.Models.Dto.ServiceHistoryDto;
@@ -22,8 +23,8 @@ namespace ServiceLog.Services
             _deviceService = deviceService;
         }
 
-        //Todo: Dodanie sprawdzenia czy akcja serwisowa istnieje w kategorii, jeżeli nie to zwrócenie błędu
-
+        
+        //Todo: Dodanie filtrow do getAll a to pozwoli filtrowac po id urzadzenia, wtedy deviceService moze zwracac powiazane urzadzenia
         public async Task<CreateServiceHistoryResponseDto> CreateServiceHistoryAsync(CreateServiceHistoryRequestDto createServiceHistoryRequestDto)
         {
             try
@@ -151,11 +152,11 @@ namespace ServiceLog.Services
             }
         }
 
-        public async Task<GetAllServiceHistoriesResposneDto> GetAllServiceHistoriesAsync()
+        public async Task<GetAllServiceHistoriesResposneDto> GetAllServiceHistoriesAsync(ServiceHistoryFilter? serviceHistoryFilter)
         {
             try
             {
-                var serviceHistories = await _serviceHistoryRepository.GetAllServiceHistoriesAsync();
+                var serviceHistories = await _serviceHistoryRepository.GetAllServiceHistoriesAsync(serviceHistoryFilter);
                 if (serviceHistories == null || !serviceHistories.Any())
                 {
                     return new GetAllServiceHistoriesResposneDto

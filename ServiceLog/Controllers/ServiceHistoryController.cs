@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ServiceLog.Filters;
 using ServiceLog.Models.Dto.ServiceHistoryDto;
 using ServiceLog.Services.interfaces;
 using static ServiceLog.Enums.ServiceHistoryErrorCodes;
@@ -38,11 +39,11 @@ namespace ServiceLog.Controllers
             }   
         }
         [HttpGet("")]
-        public async Task<IActionResult> GetAllServiceHistoriesAsync()
+        public async Task<IActionResult> GetAllServiceHistoriesAsync([FromQuery] ServiceHistoryFilter serviceHistoryFilter)
         {
             try
             {
-                var result = await _serviceHistoryService.GetAllServiceHistoriesAsync();
+                var result = await _serviceHistoryService.GetAllServiceHistoriesAsync(serviceHistoryFilter);
                 if (result.Success)
                 {
                     return Ok(result);

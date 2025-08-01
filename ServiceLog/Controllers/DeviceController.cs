@@ -16,6 +16,8 @@ namespace ServiceLog.Controllers
             _deviceService = deviceService;
         }
 
+        //Todo: Dodanie /api/Device/123/service-history, czyli wstrzykniecie do serwisu device serwisu servicehistory i pobranie wszystkich rekordow uzywajac filtra z id urzadzenia
+
         [HttpPost("")]
         public async Task<IActionResult> CreateNewDeviceAsync([FromBody] NewDeviceRequestDto newDeviceRequestDto)
         {
