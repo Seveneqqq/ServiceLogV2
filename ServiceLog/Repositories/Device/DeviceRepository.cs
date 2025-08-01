@@ -35,9 +35,41 @@ namespace ServiceLog.Repositories.DeviceRepository
                 .FirstOrDefaultAsync(d => d.Id == id);
         }
 
-        public async Task<List<Device>> GetDevicesAsync(DeviceFilter filter)
+        public async Task<List<Device>> GetDevicesAsync(DeviceFilter? deviceFilter)
         {
-            return await _sqlDbContext.Devices.AsNoTracking().ToListAsync();
+            if(deviceFilter == null)
+            {
+                return await _sqlDbContext.Devices.ToListAsync();
+            }
+            var query = _sqlDbContext.Devices.AsQueryable();
+
+            if (!string.IsNullOrEmpty(deviceFilter.ShortId))
+            {
+                query = query.Where(d => d.Short_id.Contains(deviceFilter.ShortId));
+            }
+            if (!string.IsNullOrEmpty(deviceFilter.SerialNumber))
+            {
+                query = query.Where(d => d.SerialNumber.Contains(deviceFilter.SerialNumber));
+            }
+            if (!string.IsNullOrEmpty(deviceFilter.Designation))
+            {
+                query = query.Where(d => d.Designation.Contains(deviceFilter.Designation));
+            }
+            if (!string.IsNullOrEmpty(deviceFilter.Location))
+            {
+                query = query.Where(d => d.Location.Contains(deviceFilter.Location));
+            }
+            if (!string.IsNullOrEmpty(deviceFilter.CategoryId))
+            {
+                query = query.Where(d => d.CategoryId == deviceFilter.CategoryId);
+            }
+            if (!string.IsNullOrEmpty(deviceFilter.Status))
+            {
+                query = query.Where(d => d.Status == deviceFilter.Status);
+            }
+
+            return await query.ToListAsync();
+
         }
 
         public async Task<Device?> UpdateDeviceAsync(Guid id, Device device)

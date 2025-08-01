@@ -1,4 +1,5 @@
 ﻿using ServiceLog.Enums;
+using ServiceLog.Filters;
 using ServiceLog.Helpers;
 using ServiceLog.Models.Domain;
 using ServiceLog.Models.Dto.DeviceDto;
@@ -159,9 +160,50 @@ namespace ServiceLog.Services
 
         }
 
-        public Task<GetAllDeviceResponseDto> GetAllDevicesAsync()
+        public async Task<GetAllDeviceResponseDto> GetAllDevicesAsync(DeviceFilter? deviceFilter)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (deviceFilter == null)
+                {
+
+                    var allResult = await _deviceRepository.GetDevicesAsync(null);
+
+                    return new GetAllDeviceResponseDto
+                    {
+                        Success = true,
+                        Message = "No filter applied, returning all devices.",
+                        Devices = allResult
+                    };
+                }
+
+                var filteredResult = await _deviceRepository.GetDevicesAsync(deviceFilter);
+
+                if (filteredResult == null || filteredResult.Count == 0)
+                {
+                    return new GetAllDeviceResponseDto
+                    {
+                        Success = false,
+                        Message = "No devices found.",
+                        ErrorCode = DeviceErrorCode.DeviceNotFound
+                    };
+                }
+                return new GetAllDeviceResponseDto
+                {
+                    Success = true,
+                    Message = "Devices retrieved successfully.",
+                    Devices = filteredResult
+                };
+            }
+            catch (Exception ex)
+            {
+                return new GetAllDeviceResponseDto
+                {
+                    Success = false,
+                    Message = $"An error occurred while retrieving devices: {ex.Message} {ex.InnerException}",
+                    ErrorCode = DeviceErrorCode.Unknown
+                };
+            }
         }
 
         public async Task<GetByIdDeviceResponseDto> GetDeviceByIdAsync(string id)
@@ -214,9 +256,98 @@ namespace ServiceLog.Services
             }
         }
 
-        public Task<UpdateDeviceResponseDto> UpdateDeviceAsync(string id, UpdateDeviceRequestDto updateDeviceRequestDto)
+        public async Task<UpdateDeviceResponseDto> UpdateDeviceAsync(string id, UpdateDeviceRequestDto updateDeviceRequestDto)
         {
-            throw new NotImplementedException();
+            if(string.IsNullOrEmpty(id))
+            {
+                return new UpdateDeviceResponseDto
+                {
+                    Success = false,
+                    Message = "Device ID cannot be null or empty.",
+                    ErrorCode = DeviceErrorCode.EmptyFields
+                };
+            }
+            if (updateDeviceRequestDto == null)
+            {
+                return new UpdateDeviceResponseDto
+                {
+                    Success = false,
+                    Message = "Update request cannot be null.",
+                    ErrorCode = DeviceErrorCode.EmptyFields
+                };
+            }
+            if (!Guid.TryParse(id, out Guid guidId))
+            {
+                return new UpdateDeviceResponseDto
+                {
+                    Success = false,
+                    Message = "Invalid Device ID format.",
+                    ErrorCode = DeviceErrorCode.InvalidData
+                };
+            }
+            try
+            {
+                var device = await _deviceRepository.GetDeviceByIdAsync(guidId);
+                if (device == null)
+                {
+                    return new UpdateDeviceResponseDto
+                    {
+                        Success = false,
+                        Message = "Device not found.",
+                        ErrorCode = DeviceErrorCode.DeviceNotFound
+                    };
+                }
+                
+                var CategoryResult = await _categoryService.GetCategoryByIdAsync(updateDeviceRequestDto.Device.CategoryId);
+
+                if (!CategoryResult.Success)
+                {
+                    return new UpdateDeviceResponseDto
+                    {
+                        Success = false,
+                        Message = "Invalid category ID.",
+                        ErrorCode = DeviceErrorCode.InvalidData
+                    };
+                }
+
+                Device requestDevice = new Device
+                {
+                    Id = guidId,
+                    SerialNumber = updateDeviceRequestDto.Device.SerialNumber,
+                    Designation = updateDeviceRequestDto.Device.Designation,
+                    Location = updateDeviceRequestDto.Device.Location,
+                    CategoryId = updateDeviceRequestDto.Device.CategoryId,
+                    Status = updateDeviceRequestDto.Device.Status
+                };
+
+                var updatedDevice = await _deviceRepository.UpdateDeviceAsync(guidId, device);
+
+                if(updatedDevice == null)
+                {
+                    return new UpdateDeviceResponseDto
+                    {
+                        Success = false,
+                        Message = "Failed to update device.",
+                        ErrorCode = DeviceErrorCode.Unknown
+                    };
+                }
+
+                return new UpdateDeviceResponseDto
+                {
+                    Success = true,
+                    Message = "Device updated successfully.",
+                    Device = updatedDevice
+                };
+            }
+            catch (Exception ex)
+            {
+                return new UpdateDeviceResponseDto
+                {
+                    Success = false,
+                    Message = $"An error occurred while updating the device: {ex.Message} {ex.InnerException}",
+                    ErrorCode = DeviceErrorCode.Unknown
+                };
+            }
         }
     }
 }
