@@ -2,9 +2,12 @@
 using ServiceLog.Filters;
 using ServiceLog.Models.Domain;
 using ServiceLog.Models.Dto.CategoryDto;
+using ServiceLog.Models.Dto.DeviceDto;
 using ServiceLog.Models.Dto.ServiceHistoryDto;
+using ServiceLog.Repositories.DeviceRepository;
 using ServiceLog.Repositories.ServiceHistoryRepository;
 using ServiceLog.Services.interfaces;
+using static ServiceLog.Enums.DeviceErrorCodes;
 using static ServiceLog.Enums.ServiceHistoryErrorCodes;
 
 namespace ServiceLog.Services
@@ -14,13 +17,13 @@ namespace ServiceLog.Services
 
         private readonly IServiceHistoryRepository _serviceHistoryRepository;
         private readonly ICategoryService _categoryService;
-        private readonly IDeviceService _deviceService;
+        private readonly IDeviceRepository _deviceRepository;
 
-        public ServiceHistoryService(IServiceHistoryRepository serviceHistoryRepository, ICategoryService categoryService, IDeviceService deviceService)
+        public ServiceHistoryService(IServiceHistoryRepository serviceHistoryRepository, ICategoryService categoryService, IDeviceRepository deviceRepository)
         {
             _serviceHistoryRepository = serviceHistoryRepository;
             _categoryService = categoryService;
-            _deviceService = deviceService;
+            _deviceRepository = deviceRepository;
         }
 
         
@@ -53,8 +56,18 @@ namespace ServiceLog.Services
                     };
                 }
 
-                var deviceResult = await _deviceService.GetDeviceByIdAsync(createServiceHistoryRequestDto.DeviceId);
-                if(deviceResult != null && !deviceResult.Success)
+                if (!Guid.TryParse(createServiceHistoryRequestDto.DeviceId, out Guid deviceGuidId))
+                {
+                    return new CreateServiceHistoryResponseDto
+                    {
+                        Success = false,
+                        Message = "Invalid Device ID format.",
+                        ErrorCode = ServiceHistoryErrorCode.InvalidData
+                    };
+                }
+
+                var deviceResult = await _deviceRepository.GetDeviceByIdAsync(deviceGuidId);
+                if(deviceResult == null)
                 {
                     return new CreateServiceHistoryResponseDto
                     {
@@ -65,7 +78,7 @@ namespace ServiceLog.Services
                 }
                 else
                 {
-                    var categoryResult = await _categoryService.GetCategoryByIdAsync(deviceResult.Device.CategoryId);
+                    var categoryResult = await _categoryService.GetCategoryByIdAsync(deviceResult.CategoryId);
 
                     foreach(var serviceOption in createServiceHistoryRequestDto.PerformedServiceOptions)
                     {
@@ -152,21 +165,21 @@ namespace ServiceLog.Services
             }
         }
 
-        public async Task<GetAllServiceHistoriesResposneDto> GetAllServiceHistoriesAsync(ServiceHistoryFilter? serviceHistoryFilter)
+        public async Task<GetAllServiceHistoriesResponseDto> GetAllServiceHistoriesAsync(ServiceHistoryFilter? serviceHistoryFilter)
         {
             try
             {
                 var serviceHistories = await _serviceHistoryRepository.GetAllServiceHistoriesAsync(serviceHistoryFilter);
                 if (serviceHistories == null || !serviceHistories.Any())
                 {
-                    return new GetAllServiceHistoriesResposneDto
+                    return new GetAllServiceHistoriesResponseDto
                     {
                         Success = false,
                         Message = "No service histories found.",
                         ErrorCode = ServiceHistoryErrorCode.ServiceHistoryNotFound
                     };
                 }
-                return new GetAllServiceHistoriesResposneDto
+                return new GetAllServiceHistoriesResponseDto
                 {
                     Success = true,
                     Message = "Service histories retrieved successfully.",
@@ -176,7 +189,7 @@ namespace ServiceLog.Services
             }
             catch (Exception e)
             {
-                return new GetAllServiceHistoriesResposneDto
+                return new GetAllServiceHistoriesResponseDto
                 {
                     Success = false,
                     Message = $"Error retrieving service histories: {e.Message}",

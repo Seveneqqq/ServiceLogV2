@@ -16,8 +16,6 @@ namespace ServiceLog.Controllers
             _deviceService = deviceService;
         }
 
-        //Todo: Dodanie /api/Device/123/service-history, czyli wstrzykniecie do serwisu device serwisu servicehistory i pobranie wszystkich rekordow uzywajac filtra z id urzadzenia
-
         [HttpPost("")]
         public async Task<IActionResult> CreateNewDeviceAsync([FromBody] NewDeviceRequestDto newDeviceRequestDto)
         {
@@ -95,6 +93,29 @@ namespace ServiceLog.Controllers
             try
             {
                 var result = await _deviceService.GetAllDevicesAsync(deviceFilter);
+                if (result.Success)
+                {
+                    return Ok(result);
+                }
+                return result.ErrorCode switch
+                {
+                    DeviceErrorCode.DeviceNotFound => NotFound(result),
+                    DeviceErrorCode.InvalidData => Unauthorized(result),
+                    DeviceErrorCode.EmptyFields => BadRequest(result),
+                    _ => BadRequest(result)
+                };
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"Error:: {e.Message}");
+            }
+        }
+        [HttpGet("{id}/service-history")]
+        public async Task<IActionResult> GetDeviceServiceHistoryAsync([FromRoute] string id)
+        {
+            try
+            {
+                var result = await _deviceService.getDeviceServiceHistory(id);
                 if (result.Success)
                 {
                     return Ok(result);

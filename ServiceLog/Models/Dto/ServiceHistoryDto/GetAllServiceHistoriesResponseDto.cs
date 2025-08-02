@@ -5,7 +5,7 @@ using ServiceLog.Models.Domain;
 
 namespace ServiceLog.Models.Dto.ServiceHistoryDto
 {
-    public class GetAllServiceHistoriesResposneDto
+    public class GetAllServiceHistoriesResponseDto
     {
         [Required]
         public bool Success { get; set; }

@@ -8,7 +8,7 @@ namespace ServiceLog.Services.interfaces
     public interface IServiceHistoryService
     {
         Task<CreateServiceHistoryResponseDto> CreateServiceHistoryAsync(CreateServiceHistoryRequestDto createServiceHistoryRequestDto);
-        Task<GetAllServiceHistoriesResposneDto> GetAllServiceHistoriesAsync(ServiceHistoryFilter? serviceHistoryFilter);
+        Task<GetAllServiceHistoriesResponseDto> GetAllServiceHistoriesAsync(ServiceHistoryFilter? serviceHistoryFilter);
         Task<GetByIdServiceHistoryResponseDto> GetServiceHistoryByIdAsync(string id);
         Task<ServiceHistoryResponseDto> UpdateServiceHistoryAsync(string id, UpdateServiceHistoryRequestDto updateServiceHistoryRequestDto);
         Task<ServiceHistoryResponseDto> DeleteServiceHistoryAsync(string id);
