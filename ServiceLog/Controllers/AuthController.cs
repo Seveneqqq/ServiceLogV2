@@ -11,7 +11,7 @@ namespace ServiceLog.Controllers
     [ApiController]
     public class AuthController : Controller
     {
-
+        //Todo: Dodać tabelę która będzie przechowywać technicanId i informacje o techniku
         private readonly IAuthService _authService;
 
         public AuthController(IAuthService authService)
