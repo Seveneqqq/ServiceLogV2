@@ -8,6 +8,9 @@ using static ServiceLog.Enums.TicketErrorCodes;
 
 namespace ServiceLog.Services
 {
+
+    //Todo: Utworzenie metody która będzie zmianiała status ticketu
+
     public class TicketService : ITicketService
     {
         private readonly ITicketRepository _ticketRepository;

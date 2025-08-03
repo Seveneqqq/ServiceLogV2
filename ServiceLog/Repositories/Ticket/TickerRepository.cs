@@ -37,7 +37,7 @@ namespace ServiceLog.Repositories.TicketRepository
             throw new NotImplementedException();
         }
 
-        public Task UpdateTicketAsync(string id, UpdateTicketRequestDto updateTicketRequestDto)
+        public Task UpdateTicketAsync(string id, Ticket ticket)
         {
             throw new NotImplementedException();
         }
