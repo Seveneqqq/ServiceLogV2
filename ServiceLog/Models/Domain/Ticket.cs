@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using System.ComponentModel.DataAnnotations;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace ServiceLog.Models.Domain
@@ -16,10 +17,11 @@ namespace ServiceLog.Models.Domain
         public DateTime? ResolvedDate { get; set; }
 
         [BsonElement("status")]
+        [AllowedValues("Open", "In Progress", "Closed")]
         public string Status { get; set; }
 
         [BsonElement("devices")]
-        public List<string> Devices { get; set; }  
+        public List<Device> Devices { get; set; }  
 
         [BsonElement("description")]
         public string Description { get; set; }
@@ -28,7 +30,7 @@ namespace ServiceLog.Models.Domain
         public string ClientId { get; set; }
 
         [BsonElement("status_history")]
-        public List<StatusHistoryEntry> StatusHistory { get; set; } = new List<StatusHistoryEntry>();
+        public List<StatusHistoryEntry>? StatusHistory { get; set; } = new List<StatusHistoryEntry>();
 
         [BsonElement("technican_id")]
         public string TechnicanId { get; set; }
