@@ -1,6 +1,7 @@
 ﻿using static ServiceLog.Enums.TicketErrorCodes;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using ServiceLog.Models.Domain;
 
 namespace ServiceLog.Models.Dto.TicketDto
 {
@@ -12,5 +13,7 @@ namespace ServiceLog.Models.Dto.TicketDto
         public string Message { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public TicketErrorCode ErrorCode { get; set; } = TicketErrorCode.None;
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public List<Ticket>? Tickets { get; set; }
     }
 }

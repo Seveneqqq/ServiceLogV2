@@ -1,9 +1,11 @@
 ﻿using ServiceLog.Enums;
 using ServiceLog.Filters;
 using ServiceLog.Models.Domain;
+using ServiceLog.Models.Dto.DeviceDto;
 using ServiceLog.Models.Dto.TicketDto;
 using ServiceLog.Repositories.TicketRepository;
 using ServiceLog.Services.interfaces;
+using static ServiceLog.Enums.DeviceErrorCodes;
 using static ServiceLog.Enums.TicketErrorCodes;
 
 namespace ServiceLog.Services
@@ -56,7 +58,6 @@ namespace ServiceLog.Services
                     ReceivedDate = createTicketRequestDto.ReceivedDate,
                     ResolvedDate = null, 
                     Status = createTicketRequestDto.Status,
-                    Devices = null,
                     Description = createTicketRequestDto.Description,
                     ClientId = createTicketRequestDto.ClientId,
                     TechnicanId = createTicketRequestDto.TechnicanId,
@@ -126,7 +127,43 @@ namespace ServiceLog.Services
 
         public async Task<GetAllTicketsResponseDto> GetAllTicketsAsync(TicketFilter ticketFilter)
         {
-            throw new NotImplementedException();
+            if (ticketFilter == null)
+            {
+                return new GetAllTicketsResponseDto
+                {
+                    Success = false,
+                    Message = "Invalid filter data.",
+                    ErrorCode = TicketErrorCode.EmptyFields
+                };
+            }
+            try
+            {
+                var tickets = await _ticketRepository.GetAllTicketsAsync(ticketFilter);
+                if (tickets == null || !tickets.Any())
+                {
+                    return new GetAllTicketsResponseDto
+                    {
+                        Success = false,
+                        Message = "No tickets found.",
+                        ErrorCode = TicketErrorCode.TicketNotFound
+                    };
+                }
+                return new GetAllTicketsResponseDto
+                {
+                    Success = true,
+                    Message = "Tickets retrieved successfully.",
+                    Tickets = tickets
+                };
+            }
+            catch (Exception ex)
+            {
+                return new GetAllTicketsResponseDto
+                {
+                    Success = false,
+                    Message = $"An error occurred while retrieving tickets: {ex.Message}",
+                    ErrorCode = TicketErrorCode.Unknown
+                };
+            }
         }
 
         public async Task<GetTicketByIdResponseDto> GetTicketByIdAsync(string id)
@@ -172,7 +209,67 @@ namespace ServiceLog.Services
 
         public async Task<UpdateTicketResponseDto> UpdateTicketAsync(string id, UpdateTicketRequestDto updateTicketRequestDto)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(id) || updateTicketRequestDto == null)
+            {
+                return new UpdateTicketResponseDto
+                {
+                    Success = false,
+                    Message = "Invalid request data.",
+                    ErrorCode = TicketErrorCode.EmptyFields
+                };
+            }
+
+            if (string.IsNullOrEmpty(updateTicketRequestDto.Status))
+            {
+                return new UpdateTicketResponseDto
+                {
+                    Success = false,
+                    Message = "Status cannot be empty.",
+                    ErrorCode = TicketErrorCode.EmptyFields
+                };
+            }
+
+            try
+            {
+                var existingTicket = await _ticketRepository.GetTicketByIdAsync(id);
+                if (existingTicket == null)
+                {
+                    return new UpdateTicketResponseDto
+                    {
+                        Success = false,
+                        Message = "Ticket not found.",
+                        ErrorCode = TicketErrorCode.TicketNotFound
+                    };
+                }
+
+                //Todo: Sprawdzanie czy technik i client istnieją
+
+                existingTicket.ReceivedDate = updateTicketRequestDto.ReceivedDate;
+                existingTicket.Status = updateTicketRequestDto.Status ?? existingTicket.Status;
+                existingTicket.Description = updateTicketRequestDto.Description ?? existingTicket.Description;
+                existingTicket.ClientId = updateTicketRequestDto.ClientId ?? existingTicket.ClientId;
+                existingTicket.TechnicanId = updateTicketRequestDto.TechnicanId ?? existingTicket.TechnicanId;
+                existingTicket.ReceivingMethod = updateTicketRequestDto.ReceivingMethod ?? existingTicket.ReceivingMethod;
+                existingTicket.ReturnMethod = updateTicketRequestDto.ReturnMethod ?? existingTicket.ReturnMethod;
+
+                await _ticketRepository.UpdateTicketAsync(id, existingTicket);
+
+                return new UpdateTicketResponseDto
+                {
+                    Success = true,
+                    Message = "Ticket updated successfully."
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new UpdateTicketResponseDto
+                {
+                    Success = false,
+                    Message = $"An error occurred while updating the ticket: {ex.Message}",
+                    ErrorCode = TicketErrorCode.Unknown
+                };
+            }
         }
     }
 }

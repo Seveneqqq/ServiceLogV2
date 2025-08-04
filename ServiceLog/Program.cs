@@ -11,6 +11,7 @@ using ServiceLog.Middlewares;
 using ServiceLog.Repositories.CategoryRepository;
 using ServiceLog.Repositories.ServiceHistoryRepository;
 using ServiceLog.Repositories.DeviceRepository;
+using ServiceLog.Repositories.TicketRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -92,6 +93,7 @@ builder.Services.AddDbContext<SqlDbContext>(options =>
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IServiceHistoryRepository, ServiceHistoryRepository>();
 builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
+builder.Services.AddScoped<ITicketRepository, TickerRepository>();
 
 //service registration
 builder.Services.AddScoped<IServiceHistoryService, ServiceHistoryService>();
@@ -99,6 +101,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IDeviceService, DeviceService>();
+builder.Services.AddScoped<ITicketService, TicketService>();
 
 //Todo: Add rate limiting
 //Todo: Configure Endpoint access by roles
