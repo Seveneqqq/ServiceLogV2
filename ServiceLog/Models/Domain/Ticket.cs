@@ -21,7 +21,7 @@ namespace ServiceLog.Models.Domain
         public string Status { get; set; }
 
         [BsonElement("devices")]
-        public List<Device> Devices { get; set; }  
+        public List<Device>? Devices { get; set; } = new List<Device>();
 
         [BsonElement("description")]
         public string Description { get; set; }

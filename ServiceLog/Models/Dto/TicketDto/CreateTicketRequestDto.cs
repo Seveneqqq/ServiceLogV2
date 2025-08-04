@@ -12,7 +12,7 @@ namespace ServiceLog.Models.Dto.TicketDto
         [AllowedValues("Open", "In Progress", "Closed")]
         public string Status { get; set; }
         [Required]
-        public List<Device> Devices { get; set; }
+        public List<Device>? Devices { get; set; }
         [Required]
         public string Description { get; set; }
         [Required]

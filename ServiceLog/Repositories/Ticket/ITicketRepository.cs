@@ -7,10 +7,9 @@ namespace ServiceLog.Repositories.TicketRepository
     public interface ITicketRepository
     {
         Task CreateTicketAsync(Ticket ticket);
-        Task GetAllTicketsAsync(TicketFilter? ticketFilter);
-        Task GetTicketByIdAsync(string id);
+        Task<List<Ticket>> GetAllTicketsAsync(TicketFilter? ticketFilter);
+        Task<Ticket> GetTicketByIdAsync(string id);
         Task UpdateTicketAsync(string id, Ticket ticket);
         Task DeleteTicketAsync(string id);
-        Task GetAllTicketsByDeviceIdAsync(string deviceId);
     }
 }

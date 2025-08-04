@@ -239,7 +239,6 @@ namespace ServiceLog.Services
             }
         }
 
-        //Todo: Dodanie sprawdzenia czy akcja serwisowa istnieje w kategorii, jeżeli nie to zwrócenie błędu
         public async Task<ServiceHistoryResponseDto> UpdateServiceHistoryAsync(string id, UpdateServiceHistoryRequestDto updateServiceHistoryRequestDto)
         {
             if (updateServiceHistoryRequestDto == null)

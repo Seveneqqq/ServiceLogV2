@@ -33,12 +33,15 @@ namespace ServiceLog.Services
                 string.IsNullOrEmpty(createTicketRequestDto.ReceivedDate.ToString()) ||
                 string.IsNullOrWhiteSpace(createTicketRequestDto.Status) ||
                 string.IsNullOrWhiteSpace(createTicketRequestDto.Description) ||
+                string.IsNullOrWhiteSpace(createTicketRequestDto.ClientId) ||
                 string.IsNullOrWhiteSpace(createTicketRequestDto.TechnicanId) ||
                 string.IsNullOrWhiteSpace(createTicketRequestDto.ReceivingMethod) ||
-                string.IsNullOrWhiteSpace(createTicketRequestDto.ReturnMethod) ||
-                !createTicketRequestDto.Devices.Any() 
+                string.IsNullOrWhiteSpace(createTicketRequestDto.ReturnMethod) 
                 )
             {
+
+                //Todo: Sprawdzanie czy Client i technican istnieją w bazie
+
                 return new CreateTicketResponseDto
                 {
                     Success = false,
@@ -48,12 +51,12 @@ namespace ServiceLog.Services
             }
             try
             {
-                var ticket = new Models.Domain.Ticket
+                var ticket = new Ticket
                 {
                     ReceivedDate = createTicketRequestDto.ReceivedDate,
                     ResolvedDate = null, 
                     Status = createTicketRequestDto.Status,
-                    Devices = createTicketRequestDto.Devices,
+                    Devices = null,
                     Description = createTicketRequestDto.Description,
                     ClientId = createTicketRequestDto.ClientId,
                     TechnicanId = createTicketRequestDto.TechnicanId,
@@ -82,7 +85,43 @@ namespace ServiceLog.Services
 
         public async Task<DeleteTicketResponseDto> DeleteTicketAsync(string id)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return new DeleteTicketResponseDto
+                {
+                    Success = false,
+                    Message = "Ticket ID cannot be null or empty.",
+                    ErrorCode = TicketErrorCode.EmptyFields
+                };
+            }
+            try
+            {
+                var ticket = await _ticketRepository.GetTicketByIdAsync(id);
+                if (ticket == null)
+                {
+                    return new DeleteTicketResponseDto
+                    {
+                        Success = false,
+                        Message = "Ticket not found.",
+                        ErrorCode = TicketErrorCode.TicketNotFound
+                    };
+                }
+                await _ticketRepository.DeleteTicketAsync(ticket.Id);
+                return new DeleteTicketResponseDto
+                {
+                    Success = true,
+                    Message = "Ticket deleted successfully."
+                };
+            }
+            catch (Exception ex)
+            {
+                return new DeleteTicketResponseDto
+                {
+                    Success = false,
+                    Message = $"An error occurred while deleting the ticket: {ex.Message}",
+                    ErrorCode = TicketErrorCode.Unknown
+                };
+            }
         }
 
         public async Task<GetAllTicketsResponseDto> GetAllTicketsAsync(TicketFilter ticketFilter)
@@ -92,7 +131,43 @@ namespace ServiceLog.Services
 
         public async Task<GetTicketByIdResponseDto> GetTicketByIdAsync(string id)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return new GetTicketByIdResponseDto
+                {
+                    Success = false,
+                    Message = "Ticket ID cannot be null or empty.",
+                    ErrorCode = TicketErrorCode.EmptyFields
+                };
+            }
+            try
+            {
+                var ticket = await _ticketRepository.GetTicketByIdAsync(id);
+                if (ticket == null)
+                {
+                    return new GetTicketByIdResponseDto
+                    {
+                        Success = false,
+                        Message = "Ticket not found.",
+                        ErrorCode = TicketErrorCode.TicketNotFound
+                    };
+                }
+                return new GetTicketByIdResponseDto
+                {
+                    Success = true,
+                    Message = "Ticket retrieved successfully.",
+                    Ticket = ticket
+                };
+            }
+            catch (Exception ex)
+            {
+                return new GetTicketByIdResponseDto
+                {
+                    Success = false,
+                    Message = $"An error occurred while retrieving the ticket: {ex.Message}",
+                    ErrorCode = TicketErrorCode.Unknown
+                };
+            }
         }
 
         public async Task<UpdateTicketResponseDto> UpdateTicketAsync(string id, UpdateTicketRequestDto updateTicketRequestDto)
