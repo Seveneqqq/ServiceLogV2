@@ -3,6 +3,7 @@ using ServiceLog.Filters;
 using ServiceLog.Models.Domain;
 using ServiceLog.Models.Dto.DeviceDto;
 using ServiceLog.Models.Dto.TicketDto;
+using ServiceLog.Repositories.DeviceRepository;
 using ServiceLog.Repositories.TicketRepository;
 using ServiceLog.Services.interfaces;
 using static ServiceLog.Enums.DeviceErrorCodes;
@@ -16,9 +17,11 @@ namespace ServiceLog.Services
     public class TicketService : ITicketService
     {
         private readonly ITicketRepository _ticketRepository;
-        public TicketService(ITicketRepository ticketRepository)
+        private readonly IDeviceRepository _deviceRepository;
+        public TicketService(ITicketRepository ticketRepository, IDeviceRepository deviceRepository)
         {
             _ticketRepository = ticketRepository;
+            _deviceRepository = deviceRepository;
         }
         public async Task<CreateTicketResponseDto> CreateTicketAsync(CreateTicketRequestDto createTicketRequestDto)
         {
@@ -38,7 +41,7 @@ namespace ServiceLog.Services
                 string.IsNullOrWhiteSpace(createTicketRequestDto.ClientId) ||
                 string.IsNullOrWhiteSpace(createTicketRequestDto.TechnicanId) ||
                 string.IsNullOrWhiteSpace(createTicketRequestDto.ReceivingMethod) ||
-                string.IsNullOrWhiteSpace(createTicketRequestDto.ReturnMethod) 
+                string.IsNullOrWhiteSpace(createTicketRequestDto.ReturnMethod)
                 )
             {
 
@@ -56,7 +59,7 @@ namespace ServiceLog.Services
                 var ticket = new Ticket
                 {
                     ReceivedDate = createTicketRequestDto.ReceivedDate,
-                    ResolvedDate = null, 
+                    ResolvedDate = null,
                     Status = createTicketRequestDto.Status,
                     Description = createTicketRequestDto.Description,
                     ClientId = createTicketRequestDto.ClientId,
@@ -125,7 +128,7 @@ namespace ServiceLog.Services
             }
         }
 
-        public async Task<GetAllTicketsResponseDto> GetAllTicketsAsync(TicketFilter ticketFilter)
+        public async Task<GetAllTicketsResponseDto> GetAllTicketsAsync(TicketFilter? ticketFilter)
         {
             if (ticketFilter == null)
             {
@@ -267,6 +270,67 @@ namespace ServiceLog.Services
                 {
                     Success = false,
                     Message = $"An error occurred while updating the ticket: {ex.Message}",
+                    ErrorCode = TicketErrorCode.Unknown
+                };
+            }
+        }
+        public async Task<AddDevicesToTicketResponseDto> AddDevicesToTicketAsync(string id, AddDevicesToTicketRequestDto addDevicesToTicketRequestDto)
+        {
+            if (string.IsNullOrWhiteSpace(id) || addDevicesToTicketRequestDto == null || addDevicesToTicketRequestDto.DeviceIds == null || !addDevicesToTicketRequestDto.DeviceIds.Any())
+            {
+                return new AddDevicesToTicketResponseDto
+                {
+                    Success = false,
+                    Message = "Invalid request data.",
+                    ErrorCode = TicketErrorCode.EmptyFields
+                };
+            }
+            try
+            {
+                var ticket = await _ticketRepository.GetTicketByIdAsync(id);
+                if (ticket == null)
+                {
+                    return new AddDevicesToTicketResponseDto
+                    {
+                        Success = false,
+                        Message = "Ticket not found.",
+                        ErrorCode = TicketErrorCode.TicketNotFound
+                    };
+                }
+
+                foreach (var deviceId in addDevicesToTicketRequestDto.DeviceIds)
+                {
+
+                    Guid.TryParse(deviceId, out Guid deviceGuid);
+
+                    var deviceResult = await _deviceRepository.GetDeviceByIdAsync(deviceGuid);
+
+                    if(deviceResult == null)
+                    {
+                        return new AddDevicesToTicketResponseDto
+                        {
+                            Success = false,
+                            Message = "Device not found",
+                            ErrorCode = TicketErrorCode.InvalidData
+                        };
+                    }
+
+                    ticket.DeviceIds.Add(deviceResult.Id.ToString());
+
+                }
+                await _ticketRepository.UpdateTicketAsync(id, ticket);
+                return new AddDevicesToTicketResponseDto
+                {
+                    Success = true,
+                    Message = "Devices added to ticket successfully."
+                };
+            }
+            catch (Exception ex)
+            {
+                return new AddDevicesToTicketResponseDto
+                {
+                    Success = false,
+                    Message = $"An error occurred while adding devices to the ticket: {ex.Message}",
                     ErrorCode = TicketErrorCode.Unknown
                 };
             }

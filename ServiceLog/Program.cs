@@ -12,6 +12,7 @@ using ServiceLog.Repositories.CategoryRepository;
 using ServiceLog.Repositories.ServiceHistoryRepository;
 using ServiceLog.Repositories.DeviceRepository;
 using ServiceLog.Repositories.TicketRepository;
+using MongoDB.Bson;
 
 var builder = WebApplication.CreateBuilder(args);
 

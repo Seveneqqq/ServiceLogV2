@@ -135,6 +135,28 @@ namespace ServiceLog.Controllers
                 return StatusCode(500, $"Error:: {e.Message}");
             }
         }
-
+        [HttpPost("{id}/devices")]
+        public async Task<IActionResult> AddDevicesToTicketAsync([FromRoute] string id, [FromBody] AddDevicesToTicketRequestDto addDevicesToTicketRequestDto)
+        {
+            try
+            {
+                var result = await _ticketService.AddDevicesToTicketAsync(id, addDevicesToTicketRequestDto);
+                if (result.Success)
+                {
+                    return Ok(result);
+                }
+                return result.ErrorCode switch
+                {
+                    TicketErrorCode.TicketNotFound => NotFound(result),
+                    TicketErrorCode.InvalidData => Unauthorized(result),
+                    TicketErrorCode.EmptyFields => BadRequest(result),
+                    _ => BadRequest(result)
+                };
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"Error:: {e.Message}");
+            }
+        }
     }
 }

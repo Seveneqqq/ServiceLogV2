@@ -10,5 +10,6 @@ namespace ServiceLog.Services.interfaces
         Task<GetAllTicketsResponseDto> GetAllTicketsAsync(TicketFilter? ticketFilter);
         Task<UpdateTicketResponseDto> UpdateTicketAsync(string id, UpdateTicketRequestDto updateTicketRequestDto);
         Task<DeleteTicketResponseDto> DeleteTicketAsync(string id);
+        Task<AddDevicesToTicketResponseDto> AddDevicesToTicketAsync(string id, AddDevicesToTicketRequestDto addDevicesToTicketRequestDto);
     }
 }
