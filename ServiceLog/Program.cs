@@ -12,11 +12,10 @@ using ServiceLog.Repositories.CategoryRepository;
 using ServiceLog.Repositories.ServiceHistoryRepository;
 using ServiceLog.Repositories.DeviceRepository;
 using ServiceLog.Repositories.TicketRepository;
-using MongoDB.Bson;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .WriteTo.File("Logs/ServiceLog_Log.txt", rollingInterval: RollingInterval.Minute)
@@ -89,6 +88,33 @@ builder.Services.AddDbContext<SqlDbContext>(options =>
         sqlOptions => sqlOptions.EnableRetryOnFailure()
     ));
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.User.Identity?.Name ?? httpContext.Request.Headers.Host.ToString(),
+            factory: partition => new FixedWindowRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                PermitLimit = 10,
+                QueueLimit = 0,
+                Window = TimeSpan.FromMinutes(1)
+            }));
+
+    options.OnRejected = async (context, token) =>
+        {
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+
+        var response = new
+        {
+            success = false,
+            message = "Too many requests.",
+            errorCode = 429
+        };
+
+        await context.HttpContext.Response.WriteAsJsonAsync(response);
+    };
+});
 
 //repository registration
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -124,6 +150,7 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseMiddleware<ExceptionHandler>();
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
