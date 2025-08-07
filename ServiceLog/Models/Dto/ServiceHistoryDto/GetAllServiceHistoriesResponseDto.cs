@@ -5,12 +5,8 @@ using ServiceLog.Models.Domain;
 
 namespace ServiceLog.Models.Dto.ServiceHistoryDto
 {
-    public class GetAllServiceHistoriesResponseDto
+    public class GetAllServiceHistoriesResponseDto : BaseResponseDto
     {
-        [Required]
-        public bool Success { get; set; }
-        [Required]
-        public string Message { get; set; } = string.Empty;
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public List<ServiceHistory> ServiceHistories { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]

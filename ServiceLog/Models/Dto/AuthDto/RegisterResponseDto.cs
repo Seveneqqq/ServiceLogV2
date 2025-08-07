@@ -1,17 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using static ServiceLog.Enums.AuthErrorCodes;
 
 namespace ServiceLog.Models.Dto
 {
-    public class RegisterResponseDto
+    public class RegisterResponseDto : BaseResponseDto
     {
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Token { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Role { get; set; }
-        [Required]
-        public bool Success { get; set; } = false;
-        public string? Message { get; set; } = "Registration failed. Please try again.";
-
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public AuthErrorCode ErrorCode { get; set; } = AuthErrorCode.None;
     }
 }

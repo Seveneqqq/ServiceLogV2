@@ -4,12 +4,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ServiceLog.Models.Dto.ServiceHistoryDto
 {
-    public class CreateServiceHistoryResponseDto
+    public class CreateServiceHistoryResponseDto : BaseResponseDto
     {
-        [Required]
-        public bool Success { get; set; }
-        [Required]
-        public string Message { get; set; } = string.Empty;
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ServiceHistoryErrorCode ErrorCode { get; set; } = ServiceHistoryErrorCode.None;
     }

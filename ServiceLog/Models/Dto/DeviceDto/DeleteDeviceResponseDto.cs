@@ -6,12 +6,8 @@ using ServiceLog.Models.Domain;
 
 namespace ServiceLog.Models.Dto.DeviceDto
 {
-    public class DeleteDeviceResponseDto
+    public class DeleteDeviceResponseDto : BaseResponseDto
     {
-        [Required]
-        public bool Success { get; set; }
-        [Required]
-        public string Message { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public DeviceErrorCode ErrorCode { get; set; } = DeviceErrorCode.None;
         

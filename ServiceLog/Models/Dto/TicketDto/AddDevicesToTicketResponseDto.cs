@@ -4,12 +4,8 @@ using System.Text.Json.Serialization;
 
 namespace ServiceLog.Models.Dto.TicketDto
 {
-    public class AddDevicesToTicketResponseDto
+    public class AddDevicesToTicketResponseDto : BaseResponseDto
     {
-        [Required]
-        public bool Success { get; set; }
-        [Required]
-        public string Message { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public TicketErrorCode ErrorCode { get; set; } = TicketErrorCode.None;
     }

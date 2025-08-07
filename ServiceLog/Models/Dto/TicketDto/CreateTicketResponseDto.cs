@@ -5,12 +5,8 @@ using static ServiceLog.Enums.TicketErrorCodes;
 
 namespace ServiceLog.Models.Dto.TicketDto
 {
-    public class CreateTicketResponseDto
+    public class CreateTicketResponseDto : BaseResponseDto
     {
-        [Required]
-        public bool Success { get; set; }
-        [Required]
-        public string Message { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public TicketErrorCode ErrorCode { get; set; } = TicketErrorCode.None;
     }
