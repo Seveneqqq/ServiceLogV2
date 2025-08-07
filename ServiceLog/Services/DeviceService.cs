@@ -4,6 +4,7 @@ using ServiceLog.Helpers;
 using ServiceLog.Models.Domain;
 using ServiceLog.Models.Dto.DeviceDto;
 using ServiceLog.Repositories.DeviceRepository;
+using ServiceLog.Repositories.ServiceHistoryRepository;
 using ServiceLog.Services.interfaces;
 using static ServiceLog.Enums.DeviceErrorCodes;
 
@@ -13,11 +14,13 @@ namespace ServiceLog.Services
     {
         private readonly IDeviceRepository _deviceRepository;
         private readonly ICategoryService _categoryService;
+        private readonly IServiceHistoryRepository _serviceHistoryRepository;
 
-        public DeviceService(IDeviceRepository deviceRepository, ICategoryService categoryService)
+        public DeviceService(IDeviceRepository deviceRepository, ICategoryService categoryService, IServiceHistoryRepository serviceHistoryRepository)
         {
             _deviceRepository = deviceRepository;
             _categoryService = categoryService;
+            _serviceHistoryRepository = serviceHistoryRepository;
         }
 
         private async Task<bool> IsCategoryValidAsync(string categoryId)
@@ -99,6 +102,72 @@ namespace ServiceLog.Services
                 {
                     Success = false,
                     Message = $"An error occurred while creating the device: {ex.Message} {ex.InnerException}",
+                    ErrorCode = DeviceErrorCode.Unknown
+                };
+            }
+        }
+
+        public async Task<GetDeviceServiceHistoryDto> getDeviceServiceHistory(string id)
+        {
+            if(string.IsNullOrEmpty(id))
+            {
+                return new GetDeviceServiceHistoryDto
+                {
+                    Success = false,
+                    Message = "Device ID cannot be null or empty.",
+                    ErrorCode = DeviceErrorCode.EmptyFields
+                };
+            }
+            if (!Guid.TryParse(id, out Guid guidId))
+            {
+                return new GetDeviceServiceHistoryDto
+                {
+                    Success = false,
+                    Message = "Invalid Device ID format.",
+                    ErrorCode = DeviceErrorCode.InvalidData
+                };
+            }
+            try
+            {
+                var device = await _deviceRepository.GetDeviceByIdAsync(guidId);
+                if (device == null)
+                {
+                    return new GetDeviceServiceHistoryDto
+                    {
+                        Success = false,
+                        Message = "Device not found.",
+                        ErrorCode = DeviceErrorCode.DeviceNotFound
+                    };
+                }
+
+                ServiceHistoryFilter serviceHistoryFilter = new ServiceHistoryFilter
+                {
+                    DeviceId = id
+                };
+
+                var serviceHistoryResult = await _serviceHistoryRepository.GetAllServiceHistoriesAsync(serviceHistoryFilter);
+                if (serviceHistoryResult == null)
+                {
+                    return new GetDeviceServiceHistoryDto
+                    {
+                        Success = false,
+                        Message = "No service history found for this device.",
+                        ErrorCode = DeviceErrorCode.DeviceNotFound
+                    };
+                }
+                return new GetDeviceServiceHistoryDto
+                {
+                    Success = true,
+                    Message = "Service history retrieved successfully.",
+                    serviceHistories = serviceHistoryResult
+                };
+            }
+            catch (Exception ex)
+            {
+                return new GetDeviceServiceHistoryDto
+                {
+                    Success = false,
+                    Message = $"An error occurred while retrieving the service history: {ex.Message} {ex.InnerException}",
                     ErrorCode = DeviceErrorCode.Unknown
                 };
             }

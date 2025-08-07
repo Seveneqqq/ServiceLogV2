@@ -85,7 +85,8 @@ namespace ServiceLog.Services
                 return new RegisterResponseDto
                 {
                     Success = false,
-                    Message = "Username or email cannot be empty."
+                    Message = "Username or email cannot be empty.",
+                    ErrorCode = AuthErrorCode.EmptyFields
                 };
             }
 
@@ -100,7 +101,8 @@ namespace ServiceLog.Services
                 return new RegisterResponseDto
                 {
                     Success = false,
-                    Message = "Passwords do not match."
+                    Message = "Passwords do not match.",
+                    ErrorCode = AuthErrorCode.InvalidPassword
                 };
             }
 
@@ -113,7 +115,8 @@ namespace ServiceLog.Services
                     return new RegisterResponseDto
                     {
                         Success = false,
-                        Message = "A user with this username or email already exists."
+                        Message = "A user with this username or email already exists.",
+                        ErrorCode = AuthErrorCode.UserAlreadyExists
                     };
                 }
             }

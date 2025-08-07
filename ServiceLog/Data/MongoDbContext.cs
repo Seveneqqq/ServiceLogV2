@@ -20,7 +20,7 @@ namespace ServiceLog.Data
  
                 var client = new MongoClient(settings.Value.ConnectionString);
                 _database = client.GetDatabase(settings.Value.DatabaseName);
-        
+
                 Console.WriteLine("MongoDB connection successful!");
             }
             catch (Exception ex)

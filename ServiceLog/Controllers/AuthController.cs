@@ -9,9 +9,9 @@ namespace ServiceLog.Controllers
     
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : Controller
+    public class AuthController : ControllerBase
     {
-
+        //Todo: Dodać tabelę która będzie przechowywać technicanId i informacje o techniku
         private readonly IAuthService _authService;
 
         public AuthController(IAuthService authService)

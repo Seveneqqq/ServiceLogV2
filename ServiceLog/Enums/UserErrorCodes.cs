@@ -1,15 +1,15 @@
 ﻿namespace ServiceLog.Enums
 {
-    public class AuthErrorCodes
+    public class UserErrorCodes
     {
-        public enum AuthErrorCode
+        public enum UserErrorCode
         {
             None,
             UserNotFound,
-            InvalidPassword,
-            UserAlreadyExists,
+            InvalidData,
             EmptyFields,
             Unknown
         }
     }
 }
+

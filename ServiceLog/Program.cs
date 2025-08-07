@@ -11,10 +11,11 @@ using ServiceLog.Middlewares;
 using ServiceLog.Repositories.CategoryRepository;
 using ServiceLog.Repositories.ServiceHistoryRepository;
 using ServiceLog.Repositories.DeviceRepository;
+using ServiceLog.Repositories.TicketRepository;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .WriteTo.File("Logs/ServiceLog_Log.txt", rollingInterval: RollingInterval.Minute)
@@ -87,11 +88,39 @@ builder.Services.AddDbContext<SqlDbContext>(options =>
         sqlOptions => sqlOptions.EnableRetryOnFailure()
     ));
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.User.Identity?.Name ?? httpContext.Request.Headers.Host.ToString(),
+            factory: partition => new FixedWindowRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                PermitLimit = 10,
+                QueueLimit = 0,
+                Window = TimeSpan.FromMinutes(1)
+            }));
+
+    options.OnRejected = async (context, token) =>
+        {
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+
+        var response = new
+        {
+            success = false,
+            message = "Too many requests.",
+            errorCode = 429
+        };
+
+        await context.HttpContext.Response.WriteAsJsonAsync(response);
+    };
+});
 
 //repository registration
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IServiceHistoryRepository, ServiceHistoryRepository>();
 builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
+builder.Services.AddScoped<ITicketRepository, TickerRepository>();
 
 //service registration
 builder.Services.AddScoped<IServiceHistoryService, ServiceHistoryService>();
@@ -99,6 +128,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IDeviceService, DeviceService>();
+builder.Services.AddScoped<ITicketService, TicketService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 //Todo: Add rate limiting
 //Todo: Configure Endpoint access by roles
@@ -119,6 +150,7 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseMiddleware<ExceptionHandler>();
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

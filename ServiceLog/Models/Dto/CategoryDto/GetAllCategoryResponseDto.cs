@@ -6,12 +6,8 @@ using static ServiceLog.Enums.CategoryErrorCodes;
 
 namespace ServiceLog.Models.Dto.CategoryDto
 {
-    public class GetAllCategoryResponseDto
+    public class GetAllCategoryResponseDto : BaseResponseDto
     {
-        [Required]
-        public bool Success { get; set; } = false;
-        [Required]
-        public string Message { get; set; } = String.Empty;
         [Required]
         public List<Category>? Categories { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]

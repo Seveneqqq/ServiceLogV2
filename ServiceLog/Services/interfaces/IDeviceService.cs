@@ -10,6 +10,6 @@ namespace ServiceLog.Services.interfaces
         Task<NewDeviceResponseDto> CreateDeviceAsync(NewDeviceRequestDto newDeviceRequestDto);
         Task<UpdateDeviceResponseDto> UpdateDeviceAsync(string id, UpdateDeviceRequestDto updateDeviceRequestDto);
         Task<DeleteDeviceResponseDto> DeleteDeviceAsync(string id);
-
+        Task<GetDeviceServiceHistoryDto> getDeviceServiceHistory(string id);
     }
 }

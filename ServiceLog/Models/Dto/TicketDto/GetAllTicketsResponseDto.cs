@@ -1,0 +1,15 @@
+﻿using static ServiceLog.Enums.TicketErrorCodes;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+using ServiceLog.Models.Domain;
+
+namespace ServiceLog.Models.Dto.TicketDto
+{
+    public class GetAllTicketsResponseDto : BaseResponseDto
+    {
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public TicketErrorCode ErrorCode { get; set; } = TicketErrorCode.None;
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public List<Ticket>? Tickets { get; set; }
+    }
+}

@@ -5,11 +5,15 @@ using ServiceLog.Models.Domain;
 
 namespace ServiceLog.Models.Dto.DeviceDto
 {
-    public class GetAllDeviceResponseDto : BaseResponseDto
+    public class GetDeviceServiceHistoryDto
     {
+        [Required]
+        public bool Success { get; set; }
+        [Required]
+        public string Message { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public DeviceErrorCode ErrorCode { get; set; } = DeviceErrorCode.None;
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public List<Device> Devices { get; set; }
+        public List<ServiceHistory>? serviceHistories { get; set; }
     }
 }
