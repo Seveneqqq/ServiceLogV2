@@ -13,6 +13,9 @@ using ServiceLog.Repositories.ServiceHistoryRepository;
 using ServiceLog.Repositories.DeviceRepository;
 using ServiceLog.Repositories.TicketRepository;
 using System.Threading.RateLimiting;
+using ServiceLog.Models.Domain.Validation;
+using FluentValidation;
+using ServiceLog.Models.Domain;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,13 +58,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     });
 
-
-builder.Services.AddControllers();
-
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHealthChecks();
+builder.Services.AddControllers();
 
 
 
@@ -116,6 +117,10 @@ builder.Services.AddRateLimiter(options =>
     };
 });
 
+
+//validators registration
+builder.Services.AddScoped<IValidator<Category>, CategoryValidator>();
+
 //repository registration
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IServiceHistoryRepository, ServiceHistoryRepository>();
@@ -132,7 +137,7 @@ builder.Services.AddScoped<ITicketService, TicketService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 //Todo: Configure Endpoint access by roles
-//Todo: Add Paginations and Filtering
+//Todo: Add Paginations
 
 var app = builder.Build();
 

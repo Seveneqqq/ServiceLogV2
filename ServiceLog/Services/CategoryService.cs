@@ -1,4 +1,5 @@
-﻿using ServiceLog.Models.Domain;
+﻿using FluentValidation;
+using ServiceLog.Models.Domain;
 using ServiceLog.Models.Dto.CategoryDto;
 using ServiceLog.Repositories.CategoryRepository;
 using ServiceLog.Services.interfaces;
@@ -9,10 +10,12 @@ namespace ServiceLog.Services
     public class CategoryService : ICategoryService
     {
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IValidator<Category> _validator;
 
-            public CategoryService(ICategoryRepository categoryRepository)
+            public CategoryService(ICategoryRepository categoryRepository, IValidator<Category> validator)
             {
                 _categoryRepository = categoryRepository;
+                _validator = validator;
             }
 
             public async Task<NewCategoryResponseDto> CreateCategoryAsync(NewCategoryRequestDto newCategoryRequestDto)
@@ -57,6 +60,17 @@ namespace ServiceLog.Services
                     ServiceOptions = newCategoryRequestDto.ServiceOptions,
                 };
 
+                var validationResult = await _validator.ValidateAsync(category);
+
+                if (!validationResult.IsValid)
+                {
+                    return new NewCategoryResponseDto
+                    {
+                        Success = false,
+                        Message = string.Join("; ", validationResult.Errors),
+                        ErrorCode = CategoryErrorCode.EmptyFields
+                    };
+                }
 
                 await _categoryRepository.CreateCategoryAsync(category);
 
