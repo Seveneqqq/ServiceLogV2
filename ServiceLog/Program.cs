@@ -17,6 +17,7 @@ using ServiceLog.Models.Domain.Validation;
 using FluentValidation;
 using ServiceLog.Models.Domain;
 using System.Security.Claims;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +26,6 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.File("Logs/ServiceLog_Log.txt", rollingInterval: RollingInterval.Minute)
     .MinimumLevel.Error()
     .CreateLogger();
-
 
 builder.Host.UseSerilog();
 
@@ -78,14 +78,40 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "ServiceLog API", Version = "v1" });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n" +
+                      "Wpisz 'Bearer' + spacja + token w polu poni¿ej.\r\n\r\n" +
+                      "Przyk³ad: \"Bearer abcdef12345\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" },
+                Scheme = "oauth2",
+                Name = "Bearer",
+                In = ParameterLocation.Header,
+            },
+            new List<string>()
+        }
+    });
+});
+
 builder.Services.AddHealthChecks();
 builder.Services.AddControllers();
-
-
 
 builder.Services.AddCors(options =>
 {
@@ -124,7 +150,7 @@ builder.Services.AddRateLimiter(options =>
             }));
 
     options.OnRejected = async (context, token) =>
-        {
+    {
         context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
 
         var response = new
@@ -137,7 +163,6 @@ builder.Services.AddRateLimiter(options =>
         await context.HttpContext.Response.WriteAsJsonAsync(response);
     };
 });
-
 
 //validators registration
 builder.Services.AddScoped<IValidator<Category>, CategoryValidator>();
