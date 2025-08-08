@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ServiceLog.Models.Dto.CategoryDto;
 using ServiceLog.Services.interfaces;
 using static ServiceLog.Enums.CategoryErrorCodes;
@@ -42,6 +43,7 @@ namespace ServiceLog.Controllers
             }
 
         }
+        [Authorize(Roles = "Admin")]
         [HttpGet("")]
         public async Task<IActionResult> GetAllCategoriesAsync()
         {

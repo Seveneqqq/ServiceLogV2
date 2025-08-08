@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ServiceLog.Filters;
 using ServiceLog.Models.Dto.TicketDto;
@@ -18,7 +19,7 @@ namespace ServiceLog.Controllers
         {
             _userService = userService;
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpGet("")]
         public async Task<IActionResult> GetAllUsersAsync()
         {
