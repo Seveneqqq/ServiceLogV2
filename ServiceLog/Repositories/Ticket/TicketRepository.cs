@@ -6,10 +6,10 @@ using ServiceLog.Models.Dto.TicketDto;
 
 namespace ServiceLog.Repositories.TicketRepository
 {
-    public class TickerRepository : ITicketRepository
+    public class TicketRepository : ITicketRepository
     {
         private readonly MongoDbContext _mongoDbContext;
-        public TickerRepository(MongoDbContext mongoDbContext)
+        public TicketRepository(MongoDbContext mongoDbContext)
         {
             _mongoDbContext = mongoDbContext;
         }

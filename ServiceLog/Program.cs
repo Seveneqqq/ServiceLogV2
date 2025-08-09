@@ -171,7 +171,7 @@ builder.Services.AddScoped<IValidator<Category>, CategoryValidator>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IServiceHistoryRepository, ServiceHistoryRepository>();
 builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
-builder.Services.AddScoped<ITicketRepository, TickerRepository>();
+builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 
 //service registration
 builder.Services.AddScoped<IServiceHistoryService, ServiceHistoryService>();
