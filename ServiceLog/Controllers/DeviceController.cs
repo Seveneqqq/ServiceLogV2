@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ServiceLog.Filters;
 using ServiceLog.Models.Dto.DeviceDto;
 using ServiceLog.Services.interfaces;
@@ -15,7 +16,7 @@ namespace ServiceLog.Controllers
         {
             _deviceService = deviceService;
         }
-
+        [Authorize(Roles = "Technican, Admin")]
         [HttpPost("")]
         public async Task<IActionResult> CreateNewDeviceAsync([FromBody] NewDeviceRequestDto newDeviceRequestDto)
         {
@@ -39,7 +40,7 @@ namespace ServiceLog.Controllers
                 return StatusCode(500, $"Error:: {e.Message}");
             }
         }
-
+        [Authorize(Roles = "Technican, Admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDeviceByIdAsync([FromRoute] string id)
         {
@@ -63,7 +64,7 @@ namespace ServiceLog.Controllers
                 return StatusCode(500, $"Error:: {e.Message}");
             }
         }
-
+        [Authorize(Roles = "Technican, Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDeviceAsync([FromRoute] string id)
         {
@@ -87,6 +88,7 @@ namespace ServiceLog.Controllers
                 return StatusCode(500, $"Error:: {e.Message}");
             }
         }
+        [Authorize(Roles = "Technican, Admin")]
         [HttpGet("")]
         public async Task<IActionResult> GetAllDevicesAsync([FromQuery] DeviceFilter? deviceFilter)
         {
@@ -110,6 +112,7 @@ namespace ServiceLog.Controllers
                 return StatusCode(500, $"Error:: {e.Message}");
             }
         }
+        [Authorize(Roles = "Technican, Admin")]
         [HttpGet("{id}/service-history")]
         public async Task<IActionResult> GetDeviceServiceHistoryAsync([FromRoute] string id)
         {

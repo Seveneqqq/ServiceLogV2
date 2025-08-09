@@ -17,7 +17,7 @@ namespace ServiceLog.Controllers
         {
             _categoryService = categoryService;
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost("")]
         public async Task<IActionResult> CreateNewCategoryAsync([FromBody] NewCategoryRequestDto newCategoryRequestDto)
         {
@@ -43,7 +43,7 @@ namespace ServiceLog.Controllers
             }
 
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Technican, Admin")]
         [HttpGet("")]
         public async Task<IActionResult> GetAllCategoriesAsync()
         {
@@ -69,6 +69,7 @@ namespace ServiceLog.Controllers
             }
 
         }
+        [Authorize(Roles = "Technican, Admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCategoryByIdAsync([FromRoute] string id)
         {
@@ -94,6 +95,7 @@ namespace ServiceLog.Controllers
             }
 
         }
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCategoryAsync([FromRoute] string id)
         {
@@ -118,7 +120,7 @@ namespace ServiceLog.Controllers
                 return StatusCode(500, $"Error:: {e.Message}");
             }
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCategoryAsync([FromRoute] string id, [FromBody] UpdateCategoryRequestDto updateCategoryRequestDto)
         {

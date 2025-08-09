@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ServiceLog.Filters;
 using ServiceLog.Models.Dto.ServiceHistoryDto;
@@ -16,6 +17,7 @@ namespace ServiceLog.Controllers
         {
             _serviceHistoryService = serviceHistoryService;
         }
+        [Authorize(Roles = "Technican, Admin")]
         [HttpPost("")]
         public async Task<IActionResult> CreateNewServiceHistoryAsync([FromBody] CreateServiceHistoryRequestDto createServiceHistoryRequestDto)
         {
@@ -38,6 +40,7 @@ namespace ServiceLog.Controllers
                 return StatusCode(500, $"Error:: {e.Message}");
             }   
         }
+        [Authorize(Roles = "Technican, Admin")]
         [HttpGet("")]
         public async Task<IActionResult> GetAllServiceHistoriesAsync([FromQuery] ServiceHistoryFilter serviceHistoryFilter)
         {
@@ -61,6 +64,7 @@ namespace ServiceLog.Controllers
                 return StatusCode(500, $"Error:: {e.Message}");
             }
         }
+        [Authorize(Roles = "Technican, Admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetServiceHistoryByIdAsync(string id)
         {
@@ -82,6 +86,7 @@ namespace ServiceLog.Controllers
                 return StatusCode(500, $"Error:: {e.Message}");
             }
         }
+        [Authorize(Roles = "Technican, Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteServiceHistoryAsync(string id)
         {
@@ -103,6 +108,7 @@ namespace ServiceLog.Controllers
                 return StatusCode(500, $"Error:: {e.Message}");
             }
         }
+        [Authorize(Roles = "Technican, Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateServiceHistoryAsync(string id, [FromBody] UpdateServiceHistoryRequestDto updateServiceHistoryRequestDto)
         {

@@ -41,12 +41,15 @@ namespace ServiceLog.Controllers
                 return StatusCode(500, $"Error:: {e.Message}");
             }
         }
-
+        [Authorize(Roles = "Client, Technican, Admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUserDataByIdAsync([FromRoute] string id)
         {
             try
             {
+
+                //Todo: Użytkownik może wyświetlić tylko siebie
+
                 var result = await _userService.GetUserDataByIdAsync(id);
                 if (result.Success)
                 {
@@ -64,7 +67,7 @@ namespace ServiceLog.Controllers
                 return StatusCode(500, $"Error:: {e.Message}");
             }
         }
-        
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUserByIdAsync([FromRoute] string id)
         {
@@ -87,6 +90,7 @@ namespace ServiceLog.Controllers
                 return StatusCode(500, $"Error:: {e.Message}");
             }
         }
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUserByIdAsync([FromRoute] string id, [FromBody] UpdateUserByIdRequestDto updateUserByIdRequestDto)
         {
