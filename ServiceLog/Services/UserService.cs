@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ServiceLog.Enums;
+using ServiceLog.Filters;
 using ServiceLog.Models.Dto.UserDto;
 using ServiceLog.Services.interfaces;
 using static ServiceLog.Enums.UserErrorCodes;
@@ -55,11 +56,34 @@ namespace ServiceLog.Services
             }
         }
 
-        public async Task<GetAllUsersResponseDto> GetAllUsersAsync()
+        public async Task<GetAllUsersResponseDto> GetAllUsersAsync(UserFilter? userFilter)
         {
             try
             {
-                var users = await _userManager.Users.ToListAsync();
+                
+                var usersQuery = _userManager.Users.AsQueryable();
+                if (userFilter != null)
+                {
+                    if (!string.IsNullOrEmpty(userFilter.Email))
+                    {
+                        usersQuery = usersQuery.Where(u => u.Email.Contains(userFilter.Email));
+                    }
+                    if (!string.IsNullOrEmpty(userFilter.UserName))
+                    {
+                        usersQuery = usersQuery.Where(u => u.UserName.Contains(userFilter.UserName));
+                    }
+                    if (!string.IsNullOrEmpty(userFilter.PhoneNumber))
+                    {
+                        usersQuery = usersQuery.Where(u => u.PhoneNumber.Contains(userFilter.PhoneNumber));
+                    }
+                    if (!string.IsNullOrEmpty(userFilter.Role))
+                    {
+                        usersQuery = usersQuery.Where(u => _userManager.GetRolesAsync(u).Result.Contains(userFilter.Role));
+                    }
+                }
+
+                var users = await usersQuery.ToListAsync();
+
                 return new GetAllUsersResponseDto
                 {
                     Success = true,

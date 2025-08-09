@@ -21,11 +21,11 @@ namespace ServiceLog.Controllers
         }
         [Authorize(Roles = "Admin")]
         [HttpGet("")]
-        public async Task<IActionResult> GetAllUsersAsync()
+        public async Task<IActionResult> GetAllUsersAsync([FromQuery] UserFilter userFilter)
         {
             try
             {
-                var result = await _userService.GetAllUsersAsync();
+                var result = await _userService.GetAllUsersAsync(userFilter);
                 if (result.Success)
                 {
                     return Ok(result);
