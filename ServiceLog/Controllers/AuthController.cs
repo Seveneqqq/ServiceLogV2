@@ -30,8 +30,8 @@ namespace ServiceLog.Controllers
                     Response.Cookies.Append("jwt_token", result.Token, new CookieOptions
                     {
                         HttpOnly = true,
-                        Secure = false,
-                        SameSite = SameSiteMode.None,
+                        Secure = true,
+                        SameSite = SameSiteMode.Lax,
                         Expires = DateTimeOffset.UtcNow.AddMinutes(60)
                     });
                     return Ok(result);
