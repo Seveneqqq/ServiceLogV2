@@ -16,6 +16,10 @@ namespace ServiceLog.Controllers
         {
             _deviceService = deviceService;
         }
+
+        /// <summary>
+        /// Create a new Device
+        /// </summary>
         [Authorize(Roles = "Technican, Admin")]
         [HttpPost("")]
         public async Task<IActionResult> CreateNewDeviceAsync([FromBody] NewDeviceRequestDto newDeviceRequestDto)
@@ -40,6 +44,10 @@ namespace ServiceLog.Controllers
                 return StatusCode(500, $"Error:: {e.Message}");
             }
         }
+
+        /// <summary>
+        /// Display an existing device by ID
+        /// </summary>
         [Authorize(Roles = "Technican, Admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDeviceByIdAsync([FromRoute] string id)
@@ -64,6 +72,10 @@ namespace ServiceLog.Controllers
                 return StatusCode(500, $"Error:: {e.Message}");
             }
         }
+
+        /// <summary>
+        /// Delete an existing device by ID
+        /// </summary>
         [Authorize(Roles = "Technican, Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDeviceAsync([FromRoute] string id)
@@ -88,6 +100,10 @@ namespace ServiceLog.Controllers
                 return StatusCode(500, $"Error:: {e.Message}");
             }
         }
+
+        /// <summary>
+        /// Get all devices
+        /// </summary>
         [Authorize(Roles = "Technican, Admin")]
         [HttpGet("")]
         public async Task<IActionResult> GetAllDevicesAsync([FromQuery] DeviceFilter? deviceFilter)
@@ -112,6 +128,10 @@ namespace ServiceLog.Controllers
                 return StatusCode(500, $"Error:: {e.Message}");
             }
         }
+
+        /// <summary>
+        /// Display service history by device ID
+        /// </summary>
         [Authorize(Roles = "Technican, Admin")]
         [HttpGet("{id}/service-history")]
         public async Task<IActionResult> GetDeviceServiceHistoryAsync([FromRoute] string id)
@@ -136,5 +156,7 @@ namespace ServiceLog.Controllers
                 return StatusCode(500, $"Error:: {e.Message}");
             }
         }
+
+        //Todo: dodanie update dla device
     }
 }

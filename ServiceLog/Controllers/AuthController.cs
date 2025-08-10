@@ -19,6 +19,9 @@ namespace ServiceLog.Controllers
             _authService = authService;
         }
 
+        /// <summary>
+        /// Register a new user
+        /// </summary>
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
@@ -45,6 +48,9 @@ namespace ServiceLog.Controllers
            
         }
 
+        /// <summary>
+        /// Log in an existing user
+        /// </summary>
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {

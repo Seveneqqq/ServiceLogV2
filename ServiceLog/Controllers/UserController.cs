@@ -19,6 +19,10 @@ namespace ServiceLog.Controllers
         {
             _userService = userService;
         }
+
+        /// <summary>
+        /// Display all users
+        /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpGet("")]
         public async Task<IActionResult> GetAllUsersAsync([FromQuery] UserFilter userFilter)
@@ -41,6 +45,10 @@ namespace ServiceLog.Controllers
                 return StatusCode(500, $"Error:: {e.Message}");
             }
         }
+
+        /// <summary>
+        /// Get an existing user by ID
+        /// </summary>
         [Authorize(Roles = "Client, Technican, Admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUserDataByIdAsync([FromRoute] string id)
@@ -67,6 +75,10 @@ namespace ServiceLog.Controllers
                 return StatusCode(500, $"Error:: {e.Message}");
             }
         }
+
+        /// <summary>
+        /// Delete an existing user by ID
+        /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUserByIdAsync([FromRoute] string id)
@@ -90,6 +102,10 @@ namespace ServiceLog.Controllers
                 return StatusCode(500, $"Error:: {e.Message}");
             }
         }
+
+        /// <summary>
+        /// Update an existing user by ID
+        /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUserByIdAsync([FromRoute] string id, [FromBody] UpdateUserByIdRequestDto updateUserByIdRequestDto)
