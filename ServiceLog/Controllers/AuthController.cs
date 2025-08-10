@@ -19,6 +19,9 @@ namespace ServiceLog.Controllers
             _authService = authService;
         }
 
+        /// <summary>
+        /// Register a new user
+        /// </summary>
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
@@ -30,8 +33,8 @@ namespace ServiceLog.Controllers
                     Response.Cookies.Append("jwt_token", result.Token, new CookieOptions
                     {
                         HttpOnly = true,
-                        Secure = false,
-                        SameSite = SameSiteMode.None,
+                        Secure = true,
+                        SameSite = SameSiteMode.Lax,
                         Expires = DateTimeOffset.UtcNow.AddMinutes(60)
                     });
                     return Ok(result);
@@ -45,6 +48,9 @@ namespace ServiceLog.Controllers
            
         }
 
+        /// <summary>
+        /// Log in an existing user
+        /// </summary>
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
@@ -56,8 +62,8 @@ namespace ServiceLog.Controllers
                     Response.Cookies.Append("jwt_token", result.Token, new CookieOptions
                     {
                         HttpOnly = true,
-                        Secure = false,
-                        SameSite = SameSiteMode.None,
+                        Secure = true,
+                        SameSite = SameSiteMode.Lax,
                         Expires = DateTimeOffset.UtcNow.AddMinutes(60)
                     });
                     return Ok(result);

@@ -1,4 +1,5 @@
-﻿using ServiceLog.Models.Dto.UserDto;
+﻿using ServiceLog.Filters;
+using ServiceLog.Models.Dto.UserDto;
 
 namespace ServiceLog.Services.interfaces
 {
@@ -6,7 +7,7 @@ namespace ServiceLog.Services.interfaces
     {
         Task<GetUserDataByIdResponseDto> GetUserDataByIdAsync(string userId);
         Task<DeleteUserByIdResponseDto> DeleteUserByIdAsync(string userId);
-        Task<GetAllUsersResponseDto> GetAllUsersAsync(GetAllUsersRequestDto getAllUsersRequestDto);
-        Task<UpdateUserByIdResponseDto> UpdateUserByIdAsync(UpdateUserByIdRequestDto updateUserByIdRequestDto);
+        Task<GetAllUsersResponseDto> GetAllUsersAsync(UserFilter? userFilter);
+        Task<UpdateUserByIdResponseDto> UpdateUserByIdAsync(string id, UpdateUserByIdRequestDto updateUserByIdRequestDto);
     }
 }

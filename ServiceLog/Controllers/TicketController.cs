@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ServiceLog.Filters;
 using ServiceLog.Models.Dto.TicketDto;
@@ -17,6 +18,10 @@ namespace ServiceLog.Controllers
             _ticketService = ticketService;
         }
 
+        /// <summary>
+        /// Create a new ticket
+        /// </summary>
+        [Authorize(Roles = "Client, Technican, Admin")]
         [HttpPost("")]
         public async Task<IActionResult> CreateNewTicketAsync([FromBody] CreateTicketRequestDto createTicketRequestDto)
         {
@@ -40,6 +45,11 @@ namespace ServiceLog.Controllers
                 return StatusCode(500, $"Error:: {e.Message}");
             }
         }
+
+        /// <summary>
+        /// Get an existing ticket by ID
+        /// </summary>
+        [Authorize(Roles = "Client, Technican, Admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTicketByIdAsync([FromRoute] string id)
         {
@@ -64,6 +74,10 @@ namespace ServiceLog.Controllers
             }
         }
 
+        /// <summary>
+        /// Delete an existing ticket by ID
+        /// </summary>
+        [Authorize(Roles = "Client, Technican, Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTicketAsync([FromRoute] string id)
         {
@@ -88,6 +102,10 @@ namespace ServiceLog.Controllers
             }
         }
 
+        /// <summary>
+        /// Display all tickets
+        /// </summary>
+        [Authorize(Roles = "Technican, Admin")]
         [HttpGet("")]
         public async Task<IActionResult> GetAllTicketsAsync([FromQuery] TicketFilter? ticketFilter)
         {
@@ -112,6 +130,12 @@ namespace ServiceLog.Controllers
             }
         }
 
+        //Todo: Dodanie wyświetlania ticketów tylko danego użytkownika
+
+        /// <summary>
+        /// Update an existing ticket by ID
+        /// </summary>
+        [Authorize(Roles = "Client, Technican, Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTicketAsync([FromRoute] string id,[FromBody] UpdateTicketRequestDto updateTicketRequestDto)
         {
@@ -135,6 +159,11 @@ namespace ServiceLog.Controllers
                 return StatusCode(500, $"Error:: {e.Message}");
             }
         }
+
+        /// <summary>
+        /// Add existing devices to a ticket by ID
+        /// </summary>
+        [Authorize(Roles = "Technican, Admin")]
         [HttpPost("{id}/devices")]
         public async Task<IActionResult> AddDevicesToTicketAsync([FromRoute] string id, [FromBody] AddDevicesToTicketRequestDto addDevicesToTicketRequestDto)
         {

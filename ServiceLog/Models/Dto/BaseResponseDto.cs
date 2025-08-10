@@ -1,6 +1,5 @@
-﻿using static ServiceLog.Enums.UserErrorCodes;
-using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations;
+
 
 namespace ServiceLog.Models.Dto
 {
@@ -13,3 +12,4 @@ namespace ServiceLog.Models.Dto
         
     }
 }
+

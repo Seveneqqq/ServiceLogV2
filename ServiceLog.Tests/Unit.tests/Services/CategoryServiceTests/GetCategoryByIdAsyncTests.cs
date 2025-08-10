@@ -1,5 +1,7 @@
-﻿using Moq;
+﻿using FluentValidation;
+using Moq;
 using ServiceLog.Models.Domain;
+using ServiceLog.Models.Domain.Validation;
 using ServiceLog.Repositories.CategoryRepository;
 using ServiceLog.Services;
 
@@ -9,11 +11,12 @@ namespace ServiceLog.Tests.Unit.tests.Services.CategoryServiceTests
     {
         private readonly Mock<ICategoryRepository> _categoryRepositoryMock;
         private readonly CategoryService _categoryService;
-
+        private readonly IValidator<Category> _validator;
         public GetCategoryByIdAsyncTests()
         {
             _categoryRepositoryMock = new Mock<ICategoryRepository>();
-            _categoryService = new CategoryService(_categoryRepositoryMock.Object);
+            _validator = new CategoryValidator();
+            _categoryService = new CategoryService(_categoryRepositoryMock.Object, _validator);
         }
 
         [Fact]

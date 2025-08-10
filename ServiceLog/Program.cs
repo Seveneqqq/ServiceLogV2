@@ -13,6 +13,11 @@ using ServiceLog.Repositories.ServiceHistoryRepository;
 using ServiceLog.Repositories.DeviceRepository;
 using ServiceLog.Repositories.TicketRepository;
 using System.Threading.RateLimiting;
+using ServiceLog.Models.Domain.Validation;
+using FluentValidation;
+using ServiceLog.Models.Domain;
+using System.Security.Claims;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +26,6 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.File("Logs/ServiceLog_Log.txt", rollingInterval: RollingInterval.Minute)
     .MinimumLevel.Error()
     .CreateLogger();
-
 
 builder.Host.UseSerilog();
 
@@ -33,16 +37,33 @@ builder.Services.AddIdentityCore<IdentityUser>()
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
-    options.Password.RequireDigit = false;
-    options.Password.RequireLowercase = false;
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
     options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequiredLength = 6;
-    options.Password.RequiredUniqueChars = 1;
+    options.Password.RequireUppercase = true;
+    options.Password.RequiredLength = 8;
+    options.Password.RequiredUniqueChars = 3;
 });
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            if (context.Request.Cookies.ContainsKey("jwt_token"))
+            {
+                context.Token = context.Request.Cookies["jwt_token"];
+            }
+            return Task.CompletedTask;
+        }
+    };
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -52,18 +73,50 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+        RoleClaimType = ClaimTypes.Role
+    };
+});
+
+builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "ServiceLog API", Version = "v1" });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n" +
+                      "Wpisz 'Bearer' + spacja + token w polu poni�ej.\r\n\r\n" +
+                      "Przyk�ad: \"Bearer abcdef12345\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
     });
 
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" },
+                Scheme = "oauth2",
+                Name = "Bearer",
+                In = ParameterLocation.Header,
+            },
+            new List<string>()
+        }
+    });
 
-builder.Services.AddControllers();
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+});
+
 builder.Services.AddHealthChecks();
-
-
+builder.Services.AddControllers();
 
 builder.Services.AddCors(options =>
 {
@@ -102,7 +155,7 @@ builder.Services.AddRateLimiter(options =>
             }));
 
     options.OnRejected = async (context, token) =>
-        {
+    {
         context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
 
         var response = new
@@ -116,11 +169,14 @@ builder.Services.AddRateLimiter(options =>
     };
 });
 
+//validators registration
+builder.Services.AddScoped<IValidator<Category>, CategoryValidator>();
+
 //repository registration
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IServiceHistoryRepository, ServiceHistoryRepository>();
 builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
-builder.Services.AddScoped<ITicketRepository, TickerRepository>();
+builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 
 //service registration
 builder.Services.AddScoped<IServiceHistoryService, ServiceHistoryService>();
@@ -131,9 +187,8 @@ builder.Services.AddScoped<IDeviceService, DeviceService>();
 builder.Services.AddScoped<ITicketService, TicketService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
-//Todo: Add rate limiting
 //Todo: Configure Endpoint access by roles
-//Todo: Add Paginations and Filtering
+//Todo: Add Paginations
 
 var app = builder.Build();
 
