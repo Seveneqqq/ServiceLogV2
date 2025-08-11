@@ -87,8 +87,8 @@ builder.Services.AddSwaggerGen(c =>
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n" +
-                      "Wpisz 'Bearer' + spacja + token w polu poni�ej.\r\n\r\n" +
-                      "Przyk�ad: \"Bearer abcdef12345\"",
+                      "Wpisz 'Bearer' + spacja + token w polu poniżej.\r\n\r\n" +
+                      "Przykład: \"Bearer abcdef12345\"",
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
@@ -118,6 +118,8 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddHealthChecks();
 builder.Services.AddControllers();
 
+var corsSettings = builder.Configuration.GetSection("CorsSettings");
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -126,6 +128,19 @@ builder.Services.AddCors(options =>
             .AllowAnyOrigin()
             .AllowAnyHeader()
             .AllowAnyMethod();
+    });
+    options.AddPolicy("ProductionPolicy", policy =>
+    {
+        var allowedOrigins = corsSettings.GetSection("AllowedOrigins").Get<string[]>();
+        var allowedHeaders = corsSettings.GetSection("AllowedHeaders").Get<string[]>();
+        var allowedMethods = corsSettings.GetSection("AllowedMethods").Get<string[]>();
+
+        policy
+            .WithOrigins(allowedOrigins ?? ["https://localhost:7045"])
+            .WithHeaders(allowedHeaders ?? ["Content-Type", "Authorization"])
+            .WithMethods(allowedMethods ?? ["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+            .AllowCredentials() 
+            .SetIsOriginAllowedToAllowWildcardSubdomains();
     });
 });
 
@@ -149,7 +164,7 @@ builder.Services.AddRateLimiter(options =>
             factory: partition => new FixedWindowRateLimiterOptions
             {
                 AutoReplenishment = true,
-                PermitLimit = 10,
+                PermitLimit = 20,
                 QueueLimit = 0,
                 Window = TimeSpan.FromMinutes(1)
             }));
@@ -201,9 +216,17 @@ using (var scope = app.Services.CreateScope())
 // Configure the HTTP request pipeline
 app.UseSwagger();
 app.UseSwaggerUI();
-
 app.UseHttpsRedirection();
-app.UseCors("AllowAll");
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors("AllowAll");
+}
+else
+{
+    app.UseCors("ProductionPolicy");
+}
+
 app.UseMiddleware<ExceptionHandler>();
 app.UseRateLimiter();
 app.UseAuthentication();
