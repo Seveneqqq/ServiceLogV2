@@ -53,11 +53,11 @@ namespace ServiceLog.Tests.Unit.tests.Services.ServiceHistoryServiceTests
 
             _deviceRepository
                 .Setup(repo => repo.GetDeviceByIdAsync(It.IsAny<Guid>()))
-                .ReturnsAsync(new Device { Id=new Guid("BC495CEC-BAD1-402E-FAD7-08DDCBC8500B"), CategoryId = "412312-123123-123123", Designation="Template", Location="U62", SerialNumber="device123", Short_id="dev123", Status = "Active" });
+                .ReturnsAsync(new Device { Id = new Guid("BC495CEC-BAD1-402E-FAD7-08DDCBC8500B"), CategoryId = "412312-123123-123123", Designation = "Template", Location = "U62", SerialNumber = "device123", Short_id = "dev123", Status = "Active" });
 
             _categoryService
                 .Setup(repo => repo.GetCategoryByIdAsync(It.IsAny<string>()))
-                .ReturnsAsync(new GetByIdCategoryResponseDto { Success=true, ErrorCode=CategoryErrorCodes.CategoryErrorCode.None, Message="Success", Category = new Category
+                .ReturnsAsync(new GetByIdCategoryResponseDto { Success = true, ErrorCode = CategoryErrorCodes.CategoryErrorCode.None, Message = "Success", Category = new Category
                 {
                     Id = "412312-123123-123123",
                     Name = "Test Category",
@@ -70,7 +70,7 @@ namespace ServiceLog.Tests.Unit.tests.Services.ServiceHistoryServiceTests
                                 Description = "Test Description"
                             }
                         }
-                    }
+                }
                 });
 
 
@@ -86,5 +86,78 @@ namespace ServiceLog.Tests.Unit.tests.Services.ServiceHistoryServiceTests
             Assert.Equal("Service history created successfully.", result.Message);
         }
 
-    }
-}
+
+
+        [Fact]
+        public async Task CreateServiceHistoryAsync_Should_Return_Failed_When_Request_Is_Empty() {
+            //arrange
+            CreateServiceHistoryRequestDto request = null;
+            //act
+            var result = await _ServiceHistoryService.CreateServiceHistoryAsync(request);
+            //assert
+            Assert.NotNull(result);
+            Assert.False(result.Success);
+            Assert.Equal("Request data is null", result.Message);
+        }
+
+        [Fact]
+        public async Task CreateServiceHistoryAsync_Should_Return_Failed_When_Request_Fields_Are_Empty()
+        {
+
+            //arrange
+            CreateServiceHistoryRequestDto request = new CreateServiceHistoryRequestDto
+            {
+                DeviceId = "",
+                IssueDescription = "",
+                OtherInformations = "",
+                TechnicanId = "",
+                TicketId = "",
+                PerformedServiceOptions = new List<ServiceOption>()
+            };
+
+            //act
+            var result = await _ServiceHistoryService.CreateServiceHistoryAsync(request);
+
+            //assert
+            Assert.NotNull(result);
+            Assert.False(result.Success);
+            Assert.Equal("Required fields are missing", result.Message);
+
+        }
+
+        [Fact]
+        public async Task CreateServiceHistoryAsync_Should_Return_Failed_When_DeviceId_is_Invalid()
+        {             
+            
+            //arrange
+            CreateServiceHistoryRequestDto request = new CreateServiceHistoryRequestDto
+            {
+                DeviceId = "123123",
+                IssueDescription = "Test issue",
+                OtherInformations = "Test info",
+                TechnicanId = "technician123",
+                TicketId = "ticket123",
+                PerformedServiceOptions = new List<ServiceOption>
+                    {
+                        new ServiceOption
+                        {
+                            Name = "Test Service Option",
+                            Description = "Test Description"
+                        }
+                    }
+            };
+
+            //act
+            var result = await _ServiceHistoryService.CreateServiceHistoryAsync(request);
+
+            //assert
+            Assert.NotNull(result);
+            Assert.False(result.Success);
+            Assert.Equal("Invalid Device ID format.", result.Message);
+        }
+
+
+
+        }
+   }
+
