@@ -5,13 +5,14 @@ using ServiceLog.Models.Domain.Validation;
 using ServiceLog.Models.Dto.CategoryDto;
 using ServiceLog.Repositories.CategoryRepository;
 using ServiceLog.Services;
+using ServiceLog.Services.interfaces;
 
 namespace ServiceLog.Tests.Unit.tests.Services.CategoryServiceTests
 {
     public class CreateCategoryAsyncTests
     {
         private readonly Mock<ICategoryRepository> _categoryRepositoryMock;
-        private readonly CategoryService _categoryService;
+        private readonly ICategoryService _categoryService;
         private readonly IValidator<Category> _categoryValidator;
 
         public CreateCategoryAsyncTests()
@@ -22,7 +23,7 @@ namespace ServiceLog.Tests.Unit.tests.Services.CategoryServiceTests
         }
 
         [Fact]
-        public async Task CreateCategoryAsync_ShouldReturnSuccess_WhenCategoryIsValid()
+        public async Task CreateCategoryAsync_Should_Return_Success_When_Category_Is_Valid()
         {
             // Arrange
             NewCategoryRequestDto newCategoryRequestDto = new NewCategoryRequestDto
