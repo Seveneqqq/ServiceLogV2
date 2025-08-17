@@ -9,5 +9,6 @@ namespace ServiceLog.Services.interfaces
         Task<DeleteUserByIdResponseDto> DeleteUserByIdAsync(string userId);
         Task<GetAllUsersResponseDto> GetAllUsersAsync(UserFilter? userFilter);
         Task<UpdateUserByIdResponseDto> UpdateUserByIdAsync(string id, UpdateUserByIdRequestDto updateUserByIdRequestDto);
+        Task<GetUserRoleByIdResponseDto> GetUserRoleByIdAsync(string userId);
     }
 }

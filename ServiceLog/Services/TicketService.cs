@@ -41,7 +41,6 @@ namespace ServiceLog.Services
                 string.IsNullOrWhiteSpace(createTicketRequestDto.Status) ||
                 string.IsNullOrWhiteSpace(createTicketRequestDto.Description) ||
                 string.IsNullOrWhiteSpace(createTicketRequestDto.ClientId) ||
-                string.IsNullOrWhiteSpace(createTicketRequestDto.TechnicanId) ||
                 string.IsNullOrWhiteSpace(createTicketRequestDto.ReceivingMethod) ||
                 string.IsNullOrWhiteSpace(createTicketRequestDto.ReturnMethod)
                 )
@@ -56,23 +55,13 @@ namespace ServiceLog.Services
             }
 
             var clientResult = await _userService.GetUserDataByIdAsync(createTicketRequestDto.ClientId);
-            var technicanResult = await _userService.GetUserDataByIdAsync(createTicketRequestDto.TechnicanId);
-
+          
             if (!clientResult.Success)
             {
                 return new CreateTicketResponseDto
                 {
                     Success = false,
                     Message = "Client not found.",
-                    ErrorCode = TicketErrorCode.InvalidData
-                };
-            }
-            if (!technicanResult.Success)
-            {
-                return new CreateTicketResponseDto
-                {
-                    Success = false,
-                    Message = "Technician not found.",
                     ErrorCode = TicketErrorCode.InvalidData
                 };
             }
@@ -86,7 +75,6 @@ namespace ServiceLog.Services
                     Status = createTicketRequestDto.Status,
                     Description = createTicketRequestDto.Description,
                     ClientId = createTicketRequestDto.ClientId,
-                    TechnicanId = createTicketRequestDto.TechnicanId,
                     ReceivingMethod = createTicketRequestDto.ReceivingMethod,
                     ReturnMethod = createTicketRequestDto.ReturnMethod
                 };
@@ -150,6 +138,8 @@ namespace ServiceLog.Services
                 };
             }
         }
+
+        //Todo: dodać assign do ticketa, tutaj trzeba sprawdzic czy technik istnieje, czy ma taka role i czy jest taki ticket
 
         public async Task<GetAllTicketsResponseDto> GetAllTicketsAsync(TicketFilter? ticketFilter)
         {

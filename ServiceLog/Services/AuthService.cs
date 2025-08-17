@@ -6,6 +6,8 @@ using static ServiceLog.Enums.AuthErrorCodes;
 
 namespace ServiceLog.Services
 {
+
+    //Todo: auth powinno też zwracać id użytkownika
     public class AuthService : IAuthService
     {
 
