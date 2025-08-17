@@ -12,5 +12,6 @@ namespace ServiceLog.Services.interfaces
         Task<AssignTechnicanToTaskResponseDto> AssignTechnicanToTaskAsync(string ticketId, string technicanId);
         Task<DeleteTicketResponseDto> DeleteTicketAsync(string id);
         Task<AddDevicesToTicketResponseDto> AddDevicesToTicketAsync(string id, AddDevicesToTicketRequestDto addDevicesToTicketRequestDto);
+        Task<ChangeTicketStatusResponseDto> ChangeTicketStatusAsync(string id, ChangeTicketStatusRequestDto changeTicketStatusRequestDto);
     }
 }

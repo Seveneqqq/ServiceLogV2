@@ -187,6 +187,35 @@ namespace ServiceLog.Controllers
                 return StatusCode(500, $"Error:: {e.Message}");
             }
         }
+
+        /// <summary>
+        /// Change the status of a ticket by ID
+        /// </summary>
+        [Authorize(Roles = "Technican, Admin")]
+        [HttpPatch("{id}/change-status")]
+        public async Task<IActionResult> ChangeTicketStatusAsync([FromRoute] string id, [FromBody] ChangeTicketStatusRequestDto changeTicketStatusRequestDto)
+        {
+            try
+            {
+                var result = await _ticketService.ChangeTicketStatusAsync(id, changeTicketStatusRequestDto);
+                if (result.Success)
+                {
+                    return Ok(result);
+                }
+                return result.ErrorCode switch
+                {
+                    TicketErrorCode.TicketNotFound => NotFound(result),
+                    TicketErrorCode.InvalidData => Unauthorized(result),
+                    TicketErrorCode.EmptyFields => BadRequest(result),
+                    _ => BadRequest(result)
+                };
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"Error:: {e.Message}");
+            }
+        }
+
         /// <summary>
         /// Assign a technican to a ticket by ID
         /// </summary>

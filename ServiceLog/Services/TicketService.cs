@@ -12,8 +12,6 @@ using static ServiceLog.Enums.TicketErrorCodes;
 namespace ServiceLog.Services
 {
 
-    //Todo: Utworzenie metody która będzie zmianiała status ticketu
-
     public class TicketService : ITicketService
     {
         private readonly ITicketRepository _ticketRepository;
@@ -98,6 +96,47 @@ namespace ServiceLog.Services
             }
         }
 
+        public async Task<ChangeTicketStatusResponseDto> ChangeTicketStatusAsync(string id, ChangeTicketStatusRequestDto changeTicketStatusRequestDto)
+        {
+            if (string.IsNullOrWhiteSpace(id) || changeTicketStatusRequestDto == null || string.IsNullOrWhiteSpace(changeTicketStatusRequestDto.Status))
+            {
+                return new ChangeTicketStatusResponseDto
+                {
+                    Success = false,
+                    Message = "Invalid request data.",
+                    ErrorCode = TicketErrorCode.EmptyFields
+                };
+            }
+            try
+            {
+                var ticket = await _ticketRepository.GetTicketByIdAsync(id);
+                if (ticket == null)
+                {
+                    return new ChangeTicketStatusResponseDto
+                    {
+                        Success = false,
+                        Message = "Ticket not found.",
+                        ErrorCode = TicketErrorCode.TicketNotFound
+                    };
+                }
+                ticket.Status = changeTicketStatusRequestDto.Status;
+                await _ticketRepository.UpdateTicketAsync(ticket.Id, ticket);
+                return new ChangeTicketStatusResponseDto
+                {
+                    Success = true,
+                    Message = "Ticket status changed successfully."
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ChangeTicketStatusResponseDto
+                {
+                    Success = false,
+                    Message = $"An error occurred while changing the ticket status: {ex.Message}",
+                    ErrorCode = TicketErrorCode.Unknown
+                };
+            }
+        }
         public async Task<DeleteTicketResponseDto> DeleteTicketAsync(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
@@ -139,7 +178,6 @@ namespace ServiceLog.Services
             }
         }
 
-        //Todo: dodać assign do ticketa, tutaj trzeba sprawdzic czy technik istnieje, czy ma taka role i czy jest taki ticket
         public async Task<AssignTechnicanToTaskResponseDto> AssignTechnicanToTaskAsync(string ticketId, string technicanId)
         {
             if (string.IsNullOrWhiteSpace(ticketId) || string.IsNullOrWhiteSpace(technicanId))
