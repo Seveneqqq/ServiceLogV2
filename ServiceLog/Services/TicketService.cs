@@ -140,7 +140,72 @@ namespace ServiceLog.Services
         }
 
         //Todo: dodać assign do ticketa, tutaj trzeba sprawdzic czy technik istnieje, czy ma taka role i czy jest taki ticket
+        public async Task<AssignTechnicanToTaskResponseDto> AssignTechnicanToTaskAsync(string ticketId, string technicanId)
+        {
+            if (string.IsNullOrWhiteSpace(ticketId) || string.IsNullOrWhiteSpace(technicanId))
+            {
+                return new AssignTechnicanToTaskResponseDto
+                {
+                    Success = false,
+                    Message = "Ticket ID and Technician ID cannot be null or empty.",
+                    ErrorCode = TicketErrorCode.EmptyFields
+                };
+            }
+            try
+            {
+                var ticket = await _ticketRepository.GetTicketByIdAsync(ticketId);
+                if (ticket == null)
+                {
+                    return new AssignTechnicanToTaskResponseDto
+                    {
+                        Success = false,
+                        Message = "Ticket not found.",
+                        ErrorCode = TicketErrorCode.TicketNotFound
+                    };
+                }
 
+                var roleResult = await _userService.GetUserRoleByIdAsync(technicanId);
+
+
+                if (!roleResult.Success || roleResult.Equals(null))
+                {
+                    return new AssignTechnicanToTaskResponseDto
+                    {
+                        Success = false,
+                        Message = "User not found.",
+                        ErrorCode = TicketErrorCode.InvalidData
+                    };
+                }
+
+                if(roleResult.Role != "Technican")
+                {
+                    return new AssignTechnicanToTaskResponseDto
+                    {
+                        Success = false,
+                        Message = "User is not a technician.",
+                        ErrorCode = TicketErrorCode.InvalidData
+                    };
+                }
+
+                ticket.TechnicanId = technicanId;
+                await _ticketRepository.UpdateTicketAsync(ticket.Id, ticket);
+
+                return new AssignTechnicanToTaskResponseDto
+                {
+                    Success = true,
+                    Message = "Technician assigned to ticket successfully."
+                };
+            }
+            catch (Exception ex)
+            {
+                return new AssignTechnicanToTaskResponseDto
+                {
+                    Success = false,
+                    Message = $"An error occurred while assigning technician to the ticket: {ex.Message}",
+                    ErrorCode = TicketErrorCode.Unknown
+                };
+            }
+        }
         public async Task<GetAllTicketsResponseDto> GetAllTicketsAsync(TicketFilter? ticketFilter)
         {
             if (ticketFilter == null)

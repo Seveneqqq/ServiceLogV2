@@ -187,5 +187,32 @@ namespace ServiceLog.Controllers
                 return StatusCode(500, $"Error:: {e.Message}");
             }
         }
+        /// <summary>
+        /// Assign a technican to a ticket by ID
+        /// </summary>
+        [Authorize(Roles = "Technican, Admin")]
+        [HttpPatch("{ticketId}/assign-technican")]
+        public async Task<IActionResult> AssignTechnicanToTaskAsync([FromRoute] string ticketId, [FromBody] AssignTechnicanToTaskRequestDto assignTechnicanToTaskRequestDto)
+        {
+            try
+            {
+                var result = await _ticketService.AssignTechnicanToTaskAsync(ticketId, assignTechnicanToTaskRequestDto.TechnicianId);
+                if (result.Success)
+                {
+                    return Ok(result);
+                }
+                return result.ErrorCode switch
+                {
+                    TicketErrorCode.TicketNotFound => NotFound(result),
+                    TicketErrorCode.InvalidData => Unauthorized(result),
+                    TicketErrorCode.EmptyFields => BadRequest(result),
+                    _ => BadRequest(result)
+                };
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"Error:: {e.Message}");
+            }
+        }
     }
 }
