@@ -158,5 +158,6 @@ namespace ServiceLog.Controllers
         }
 
         //Todo: dodanie update dla device
+
     }
 }

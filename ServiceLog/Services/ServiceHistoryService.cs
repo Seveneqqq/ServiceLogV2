@@ -26,8 +26,6 @@ namespace ServiceLog.Services
             _deviceRepository = deviceRepository;
         }
 
-        
-        //Todo: Dodanie filtrow do getAll a to pozwoli filtrowac po id urzadzenia, wtedy deviceService moze zwracac powiazane urzadzenia
         public async Task<CreateServiceHistoryResponseDto> CreateServiceHistoryAsync(CreateServiceHistoryRequestDto createServiceHistoryRequestDto)
         {
             try
@@ -164,7 +162,7 @@ namespace ServiceLog.Services
                 };
             }
         }
-
+    
         public async Task<GetAllServiceHistoriesResponseDto> GetAllServiceHistoriesAsync(ServiceHistoryFilter? serviceHistoryFilter)
         {
             try

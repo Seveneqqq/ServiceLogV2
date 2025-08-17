@@ -18,10 +18,12 @@ namespace ServiceLog.Services
     {
         private readonly ITicketRepository _ticketRepository;
         private readonly IDeviceRepository _deviceRepository;
-        public TicketService(ITicketRepository ticketRepository, IDeviceRepository deviceRepository)
+        private readonly IUserService _userService;
+        public TicketService(ITicketRepository ticketRepository, IDeviceRepository deviceRepository, IUserService userService)
         {
             _ticketRepository = ticketRepository;
             _deviceRepository = deviceRepository;
+            _userService = userService;
         }
         public async Task<CreateTicketResponseDto> CreateTicketAsync(CreateTicketRequestDto createTicketRequestDto)
         {
@@ -45,8 +47,6 @@ namespace ServiceLog.Services
                 )
             {
 
-                //Todo: Sprawdzanie czy Client i technican istnieją w bazie
-
                 return new CreateTicketResponseDto
                 {
                     Success = false,
@@ -54,6 +54,29 @@ namespace ServiceLog.Services
                     ErrorCode = TicketErrorCode.EmptyFields
                 };
             }
+
+            var clientResult = await _userService.GetUserDataByIdAsync(createTicketRequestDto.ClientId);
+            var technicanResult = await _userService.GetUserDataByIdAsync(createTicketRequestDto.TechnicanId);
+
+            if (!clientResult.Success)
+            {
+                return new CreateTicketResponseDto
+                {
+                    Success = false,
+                    Message = "Client not found.",
+                    ErrorCode = TicketErrorCode.InvalidData
+                };
+            }
+            if (!technicanResult.Success)
+            {
+                return new CreateTicketResponseDto
+                {
+                    Success = false,
+                    Message = "Technician not found.",
+                    ErrorCode = TicketErrorCode.InvalidData
+                };
+            }
+
             try
             {
                 var ticket = new Ticket
@@ -245,7 +268,27 @@ namespace ServiceLog.Services
                     };
                 }
 
-                //Todo: Sprawdzanie czy technik i client istnieją
+                var clientResult = await _userService.GetUserDataByIdAsync(updateTicketRequestDto.ClientId);
+                var technicanResult = await _userService.GetUserDataByIdAsync(updateTicketRequestDto.TechnicanId);
+
+                if (!clientResult.Success)
+                {
+                    return new UpdateTicketResponseDto
+                    {
+                        Success = false,
+                        Message = "Client not found.",
+                        ErrorCode = TicketErrorCode.InvalidData
+                    };
+                }
+                if (!technicanResult.Success)
+                {
+                    return new UpdateTicketResponseDto
+                    {
+                        Success = false,
+                        Message = "Technician not found.",
+                        ErrorCode = TicketErrorCode.InvalidData
+                    };
+                }
 
                 existingTicket.ReceivedDate = updateTicketRequestDto.ReceivedDate;
                 existingTicket.Status = updateTicketRequestDto.Status ?? existingTicket.Status;
@@ -254,7 +297,7 @@ namespace ServiceLog.Services
                 existingTicket.TechnicanId = updateTicketRequestDto.TechnicanId ?? existingTicket.TechnicanId;
                 existingTicket.ReceivingMethod = updateTicketRequestDto.ReceivingMethod ?? existingTicket.ReceivingMethod;
                 existingTicket.ReturnMethod = updateTicketRequestDto.ReturnMethod ?? existingTicket.ReturnMethod;
-
+              
                 await _ticketRepository.UpdateTicketAsync(id, existingTicket);
 
                 return new UpdateTicketResponseDto
