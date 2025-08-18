@@ -1,12 +1,9 @@
-﻿using ServiceLog.Enums;
-using ServiceLog.Filters;
+﻿using ServiceLog.Filters;
 using ServiceLog.Models.Domain;
-using ServiceLog.Models.Dto.DeviceDto;
 using ServiceLog.Models.Dto.TicketDto;
 using ServiceLog.Repositories.DeviceRepository;
 using ServiceLog.Repositories.TicketRepository;
 using ServiceLog.Services.interfaces;
-using static ServiceLog.Enums.DeviceErrorCodes;
 using static ServiceLog.Enums.TicketErrorCodes;
 
 namespace ServiceLog.Services
@@ -23,6 +20,7 @@ namespace ServiceLog.Services
             _deviceRepository = deviceRepository;
             _userService = userService;
         }
+
         public async Task<CreateTicketResponseDto> CreateTicketAsync(CreateTicketRequestDto createTicketRequestDto)
         {
             if (createTicketRequestDto == null)
@@ -98,15 +96,36 @@ namespace ServiceLog.Services
 
         public async Task<ChangeTicketStatusResponseDto> ChangeTicketStatusAsync(string id, ChangeTicketStatusRequestDto changeTicketStatusRequestDto)
         {
-            if (string.IsNullOrWhiteSpace(id) || changeTicketStatusRequestDto == null || string.IsNullOrWhiteSpace(changeTicketStatusRequestDto.Status))
+            if (string.IsNullOrWhiteSpace(id) || changeTicketStatusRequestDto == null || string.IsNullOrWhiteSpace(changeTicketStatusRequestDto.Status) || string.IsNullOrEmpty(changeTicketStatusRequestDto.TechnicanId))
             {
                 return new ChangeTicketStatusResponseDto
                 {
                     Success = false,
-                    Message = "Invalid request data.",
+                    Message = "Empty field in request.",
                     ErrorCode = TicketErrorCode.EmptyFields
                 };
             }
+
+            var roleResult = await _userService.GetUserRoleByIdAsync(changeTicketStatusRequestDto.TechnicanId);
+            if (!roleResult.Success || roleResult.Equals(null))
+            {
+                return new ChangeTicketStatusResponseDto
+                {
+                    Success = false,
+                    Message = "Technician not found.",
+                    ErrorCode = TicketErrorCode.InvalidData
+                };
+            }
+            if (roleResult.Role != "Technican")
+            {
+                return new ChangeTicketStatusResponseDto
+                {
+                    Success = false,
+                    Message = "User is not a technician.",
+                    ErrorCode = TicketErrorCode.InvalidData
+                };
+            }
+
             try
             {
                 var ticket = await _ticketRepository.GetTicketByIdAsync(id);
@@ -119,8 +138,33 @@ namespace ServiceLog.Services
                         ErrorCode = TicketErrorCode.TicketNotFound
                     };
                 }
+
+                if (ticket.Status.Equals(changeTicketStatusRequestDto.Status))
+                {
+                    return new ChangeTicketStatusResponseDto
+                    {
+                        Success = false,
+                        Message = "Cannot change to the same status.",
+                        ErrorCode = TicketErrorCode.InvalidData
+                    };
+                }
+
+                if (changeTicketStatusRequestDto.Status.Equals("Closed"))
+                {
+                    ticket.ResolvedDate = DateTime.UtcNow;
+                }
+
                 ticket.Status = changeTicketStatusRequestDto.Status;
+
+                ticket.StatusHistory?.Add(new StatusHistoryEntry
+                {
+                    Date = DateTime.UtcNow,
+                    NewStatus = changeTicketStatusRequestDto.Status,
+                    TechnicanId = changeTicketStatusRequestDto.TechnicanId
+                });
+
                 await _ticketRepository.UpdateTicketAsync(ticket.Id, ticket);
+
                 return new ChangeTicketStatusResponseDto
                 {
                     Success = true,

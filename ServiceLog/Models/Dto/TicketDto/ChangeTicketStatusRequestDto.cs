@@ -7,5 +7,7 @@ namespace ServiceLog.Models.Dto.TicketDto
         [Required]
         [AllowedValues("Open", "In Progress", "Closed")]
         public string Status { get; set; } = string.Empty;
+        [Required]
+        public string TechnicanId { get; set; } = string.Empty;
     }
 }
