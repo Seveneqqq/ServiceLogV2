@@ -101,7 +101,39 @@ namespace ServiceLog.Services
                 };
             }
         }
+        public async Task<GetUserRoleByIdResponseDto> GetUserRoleByIdAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
 
+            if (user == null)
+            {
+                return new GetUserRoleByIdResponseDto
+                {
+                    Success = false,
+                    Message = "User not found.",
+                    ErrorCode = UserErrorCode.UserNotFound 
+                };
+            }
+
+            var role = await _userManager.GetRolesAsync(user);
+
+            if (role == null || !role.Any())
+            {
+                return new GetUserRoleByIdResponseDto
+                {
+                    Success = false,
+                    Message = "User has no roles.",
+                    ErrorCode = UserErrorCode.EmptyFields
+                };
+            }
+
+            return new GetUserRoleByIdResponseDto
+            {
+                Success = true,
+                Message = "User role retrieved successfully.",
+                Role = role.FirstOrDefault() 
+            };
+        }
         public async Task<GetUserDataByIdResponseDto> GetUserDataByIdAsync(string userId)
         {
             if(string.IsNullOrEmpty(userId))

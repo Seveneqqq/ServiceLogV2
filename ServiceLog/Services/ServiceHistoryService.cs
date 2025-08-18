@@ -6,6 +6,7 @@ using ServiceLog.Models.Dto.DeviceDto;
 using ServiceLog.Models.Dto.ServiceHistoryDto;
 using ServiceLog.Repositories.DeviceRepository;
 using ServiceLog.Repositories.ServiceHistoryRepository;
+using ServiceLog.Repositories.TicketRepository;
 using ServiceLog.Services.interfaces;
 using static ServiceLog.Enums.DeviceErrorCodes;
 using static ServiceLog.Enums.ServiceHistoryErrorCodes;
@@ -15,19 +16,23 @@ namespace ServiceLog.Services
     public class ServiceHistoryService : IServiceHistoryService
     {
 
-        private readonly IServiceHistoryRepository _serviceHistoryRepository;
+        private readonly IUserService _userService;
+        private readonly ITicketRepository _ticketRepository;
         private readonly ICategoryService _categoryService;
         private readonly IDeviceRepository _deviceRepository;
+        private readonly IServiceHistoryRepository _serviceHistoryRepository;
 
-        public ServiceHistoryService(IServiceHistoryRepository serviceHistoryRepository, ICategoryService categoryService, IDeviceRepository deviceRepository)
+        public ServiceHistoryService(IServiceHistoryRepository serviceHistoryRepository, ICategoryService categoryService, IDeviceRepository deviceRepository, IUserService userService, ITicketRepository ticketRepository)
         {
             _serviceHistoryRepository = serviceHistoryRepository;
             _categoryService = categoryService;
             _deviceRepository = deviceRepository;
+            _userService = userService;
+            _ticketRepository = ticketRepository;
         }
 
-        
-        //Todo: Dodanie filtrow do getAll a to pozwoli filtrowac po id urzadzenia, wtedy deviceService moze zwracac powiazane urzadzenia
+     
+
         public async Task<CreateServiceHistoryResponseDto> CreateServiceHistoryAsync(CreateServiceHistoryRequestDto createServiceHistoryRequestDto)
         {
             try
@@ -41,6 +46,7 @@ namespace ServiceLog.Services
                         ErrorCode = ServiceHistoryErrorCode.EmptyFields
                     };
                 }
+
                 if (string.IsNullOrEmpty(createServiceHistoryRequestDto.IssueDescription) ||
                     string.IsNullOrEmpty(createServiceHistoryRequestDto.TicketId) ||
                     string.IsNullOrEmpty(createServiceHistoryRequestDto.TechnicanId) ||
@@ -53,6 +59,29 @@ namespace ServiceLog.Services
                         Success = false,
                         Message = "Required fields are missing",
                         ErrorCode = ServiceHistoryErrorCode.EmptyFields
+                    };
+                }
+
+                var ticket = await _ticketRepository.GetTicketByIdAsync(createServiceHistoryRequestDto.TicketId);
+                if (ticket == null)
+                {
+                    return new CreateServiceHistoryResponseDto
+                    {
+                        Success = false,
+                        Message = "Ticket not found.",
+                        ErrorCode = ServiceHistoryErrorCode.InvalidData
+                    };
+                }
+
+                var role = await _userService.GetUserRoleByIdAsync(createServiceHistoryRequestDto.TechnicanId);
+
+                if (role == null || role.Role != "Technican")
+                {
+                    return new CreateServiceHistoryResponseDto
+                    {
+                        Success = false,
+                        Message = "Technician not found or invalid role.",
+                        ErrorCode = ServiceHistoryErrorCode.InvalidData
                     };
                 }
 
@@ -164,7 +193,7 @@ namespace ServiceLog.Services
                 };
             }
         }
-
+    
         public async Task<GetAllServiceHistoriesResponseDto> GetAllServiceHistoriesAsync(ServiceHistoryFilter? serviceHistoryFilter)
         {
             try
@@ -270,6 +299,29 @@ namespace ServiceLog.Services
                         Success = false,
                         Message = "Service history not found.",
                         ErrorCode = ServiceHistoryErrorCode.ServiceHistoryNotFound
+                    };
+                }
+
+                var ticket = await _ticketRepository.GetTicketByIdAsync(updateServiceHistoryRequestDto.TicketId);
+                if (ticket == null)
+                {
+                    return new ServiceHistoryResponseDto
+                    {
+                        Success = false,
+                        Message = "Ticket not found.",
+                        ErrorCode = ServiceHistoryErrorCode.InvalidData
+                    };
+                }
+
+                var role = await _userService.GetUserRoleByIdAsync(updateServiceHistoryRequestDto.TechnicanId);
+
+                if (role == null || role.Role != "Technician")
+                {
+                    return new ServiceHistoryResponseDto
+                    {
+                        Success = false,
+                        Message = "Technician not found or invalid role.",
+                        ErrorCode = ServiceHistoryErrorCode.InvalidData
                     };
                 }
 

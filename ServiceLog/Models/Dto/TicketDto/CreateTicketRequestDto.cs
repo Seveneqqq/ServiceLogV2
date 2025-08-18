@@ -16,8 +16,6 @@ namespace ServiceLog.Models.Dto.TicketDto
         [Required]
         public string ClientId { get; set; }
         [Required]
-        public string TechnicanId { get; set; }
-        [Required]
         public string ReceivingMethod { get; set; }
         [Required]
         public string ReturnMethod { get; set; }

@@ -7,12 +7,18 @@ namespace ServiceLog.Models.Dto.TicketDto
     {
         [Required]
         public DateTime ReceivedDate { get; set; } = DateTime.UtcNow;
+        [Required]
         [AllowedValues("Open", "In Progress", "Closed")]
-        public string? Status { get; set; }
-        public string? Description { get; set; }
-        public string? ClientId { get; set; }
-        public string? TechnicanId { get; set; }
-        public string? ReceivingMethod { get; set; }
-        public string? ReturnMethod { get; set; }
+        public string Status { get; set; }
+        [Required]
+        public string Description { get; set; }
+        [Required]
+        public string ClientId { get; set; }
+        [Required]
+        public string TechnicanId { get; set; }
+        [Required]
+        public string ReceivingMethod { get; set; }
+        [Required]
+        public string ReturnMethod { get; set; }
     }
 }

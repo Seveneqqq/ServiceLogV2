@@ -12,16 +12,16 @@ using static ServiceLog.Enums.TicketErrorCodes;
 namespace ServiceLog.Services
 {
 
-    //Todo: Utworzenie metody która będzie zmianiała status ticketu
-
     public class TicketService : ITicketService
     {
         private readonly ITicketRepository _ticketRepository;
         private readonly IDeviceRepository _deviceRepository;
-        public TicketService(ITicketRepository ticketRepository, IDeviceRepository deviceRepository)
+        private readonly IUserService _userService;
+        public TicketService(ITicketRepository ticketRepository, IDeviceRepository deviceRepository, IUserService userService)
         {
             _ticketRepository = ticketRepository;
             _deviceRepository = deviceRepository;
+            _userService = userService;
         }
         public async Task<CreateTicketResponseDto> CreateTicketAsync(CreateTicketRequestDto createTicketRequestDto)
         {
@@ -39,13 +39,10 @@ namespace ServiceLog.Services
                 string.IsNullOrWhiteSpace(createTicketRequestDto.Status) ||
                 string.IsNullOrWhiteSpace(createTicketRequestDto.Description) ||
                 string.IsNullOrWhiteSpace(createTicketRequestDto.ClientId) ||
-                string.IsNullOrWhiteSpace(createTicketRequestDto.TechnicanId) ||
                 string.IsNullOrWhiteSpace(createTicketRequestDto.ReceivingMethod) ||
                 string.IsNullOrWhiteSpace(createTicketRequestDto.ReturnMethod)
                 )
             {
-
-                //Todo: Sprawdzanie czy Client i technican istnieją w bazie
 
                 return new CreateTicketResponseDto
                 {
@@ -54,6 +51,19 @@ namespace ServiceLog.Services
                     ErrorCode = TicketErrorCode.EmptyFields
                 };
             }
+
+            var clientResult = await _userService.GetUserDataByIdAsync(createTicketRequestDto.ClientId);
+          
+            if (!clientResult.Success)
+            {
+                return new CreateTicketResponseDto
+                {
+                    Success = false,
+                    Message = "Client not found.",
+                    ErrorCode = TicketErrorCode.InvalidData
+                };
+            }
+
             try
             {
                 var ticket = new Ticket
@@ -63,7 +73,6 @@ namespace ServiceLog.Services
                     Status = createTicketRequestDto.Status,
                     Description = createTicketRequestDto.Description,
                     ClientId = createTicketRequestDto.ClientId,
-                    TechnicanId = createTicketRequestDto.TechnicanId,
                     ReceivingMethod = createTicketRequestDto.ReceivingMethod,
                     ReturnMethod = createTicketRequestDto.ReturnMethod
                 };
@@ -87,6 +96,47 @@ namespace ServiceLog.Services
             }
         }
 
+        public async Task<ChangeTicketStatusResponseDto> ChangeTicketStatusAsync(string id, ChangeTicketStatusRequestDto changeTicketStatusRequestDto)
+        {
+            if (string.IsNullOrWhiteSpace(id) || changeTicketStatusRequestDto == null || string.IsNullOrWhiteSpace(changeTicketStatusRequestDto.Status))
+            {
+                return new ChangeTicketStatusResponseDto
+                {
+                    Success = false,
+                    Message = "Invalid request data.",
+                    ErrorCode = TicketErrorCode.EmptyFields
+                };
+            }
+            try
+            {
+                var ticket = await _ticketRepository.GetTicketByIdAsync(id);
+                if (ticket == null)
+                {
+                    return new ChangeTicketStatusResponseDto
+                    {
+                        Success = false,
+                        Message = "Ticket not found.",
+                        ErrorCode = TicketErrorCode.TicketNotFound
+                    };
+                }
+                ticket.Status = changeTicketStatusRequestDto.Status;
+                await _ticketRepository.UpdateTicketAsync(ticket.Id, ticket);
+                return new ChangeTicketStatusResponseDto
+                {
+                    Success = true,
+                    Message = "Ticket status changed successfully."
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ChangeTicketStatusResponseDto
+                {
+                    Success = false,
+                    Message = $"An error occurred while changing the ticket status: {ex.Message}",
+                    ErrorCode = TicketErrorCode.Unknown
+                };
+            }
+        }
         public async Task<DeleteTicketResponseDto> DeleteTicketAsync(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
@@ -128,6 +178,72 @@ namespace ServiceLog.Services
             }
         }
 
+        public async Task<AssignTechnicanToTaskResponseDto> AssignTechnicanToTaskAsync(string ticketId, string technicanId)
+        {
+            if (string.IsNullOrWhiteSpace(ticketId) || string.IsNullOrWhiteSpace(technicanId))
+            {
+                return new AssignTechnicanToTaskResponseDto
+                {
+                    Success = false,
+                    Message = "Ticket ID and Technician ID cannot be null or empty.",
+                    ErrorCode = TicketErrorCode.EmptyFields
+                };
+            }
+            try
+            {
+                var ticket = await _ticketRepository.GetTicketByIdAsync(ticketId);
+                if (ticket == null)
+                {
+                    return new AssignTechnicanToTaskResponseDto
+                    {
+                        Success = false,
+                        Message = "Ticket not found.",
+                        ErrorCode = TicketErrorCode.TicketNotFound
+                    };
+                }
+
+                var roleResult = await _userService.GetUserRoleByIdAsync(technicanId);
+
+
+                if (!roleResult.Success || roleResult.Equals(null))
+                {
+                    return new AssignTechnicanToTaskResponseDto
+                    {
+                        Success = false,
+                        Message = "User not found.",
+                        ErrorCode = TicketErrorCode.InvalidData
+                    };
+                }
+
+                if(roleResult.Role != "Technican")
+                {
+                    return new AssignTechnicanToTaskResponseDto
+                    {
+                        Success = false,
+                        Message = "User is not a technician.",
+                        ErrorCode = TicketErrorCode.InvalidData
+                    };
+                }
+
+                ticket.TechnicanId = technicanId;
+                await _ticketRepository.UpdateTicketAsync(ticket.Id, ticket);
+
+                return new AssignTechnicanToTaskResponseDto
+                {
+                    Success = true,
+                    Message = "Technician assigned to ticket successfully."
+                };
+            }
+            catch (Exception ex)
+            {
+                return new AssignTechnicanToTaskResponseDto
+                {
+                    Success = false,
+                    Message = $"An error occurred while assigning technician to the ticket: {ex.Message}",
+                    ErrorCode = TicketErrorCode.Unknown
+                };
+            }
+        }
         public async Task<GetAllTicketsResponseDto> GetAllTicketsAsync(TicketFilter? ticketFilter)
         {
             if (ticketFilter == null)
@@ -245,7 +361,27 @@ namespace ServiceLog.Services
                     };
                 }
 
-                //Todo: Sprawdzanie czy technik i client istnieją
+                var clientResult = await _userService.GetUserDataByIdAsync(updateTicketRequestDto.ClientId);
+                var technicanResult = await _userService.GetUserDataByIdAsync(updateTicketRequestDto.TechnicanId);
+
+                if (!clientResult.Success)
+                {
+                    return new UpdateTicketResponseDto
+                    {
+                        Success = false,
+                        Message = "Client not found.",
+                        ErrorCode = TicketErrorCode.InvalidData
+                    };
+                }
+                if (!technicanResult.Success)
+                {
+                    return new UpdateTicketResponseDto
+                    {
+                        Success = false,
+                        Message = "Technician not found.",
+                        ErrorCode = TicketErrorCode.InvalidData
+                    };
+                }
 
                 existingTicket.ReceivedDate = updateTicketRequestDto.ReceivedDate;
                 existingTicket.Status = updateTicketRequestDto.Status ?? existingTicket.Status;
@@ -254,7 +390,7 @@ namespace ServiceLog.Services
                 existingTicket.TechnicanId = updateTicketRequestDto.TechnicanId ?? existingTicket.TechnicanId;
                 existingTicket.ReceivingMethod = updateTicketRequestDto.ReceivingMethod ?? existingTicket.ReceivingMethod;
                 existingTicket.ReturnMethod = updateTicketRequestDto.ReturnMethod ?? existingTicket.ReturnMethod;
-
+              
                 await _ticketRepository.UpdateTicketAsync(id, existingTicket);
 
                 return new UpdateTicketResponseDto
