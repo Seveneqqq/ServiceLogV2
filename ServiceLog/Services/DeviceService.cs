@@ -367,7 +367,7 @@ namespace ServiceLog.Services
                     };
                 }
                 
-                var CategoryResult = await _categoryService.GetCategoryByIdAsync(updateDeviceRequestDto.Device.CategoryId);
+                var CategoryResult = await _categoryService.GetCategoryByIdAsync(updateDeviceRequestDto.CategoryId);
 
                 if (!CategoryResult.Success)
                 {
@@ -382,11 +382,11 @@ namespace ServiceLog.Services
                 Device requestDevice = new Device
                 {
                     Id = guidId,
-                    SerialNumber = updateDeviceRequestDto.Device.SerialNumber,
-                    Designation = updateDeviceRequestDto.Device.Designation,
-                    Location = updateDeviceRequestDto.Device.Location,
-                    CategoryId = updateDeviceRequestDto.Device.CategoryId,
-                    Status = updateDeviceRequestDto.Device.Status
+                    SerialNumber = updateDeviceRequestDto.SerialNumber,
+                    Designation = updateDeviceRequestDto.Designation,
+                    Location = updateDeviceRequestDto.Location,
+                    CategoryId = updateDeviceRequestDto.CategoryId,
+                    Status = updateDeviceRequestDto.Status
                 };
 
                 var updatedDevice = await _deviceRepository.UpdateDeviceAsync(guidId, device);
