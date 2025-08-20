@@ -8,12 +8,13 @@ namespace ServiceLog.Models.Dto.DeviceDto
     public class UpdateDeviceRequestDto
     {
         [Required]
-        public bool Success { get; set; }
+        public string SerialNumber { get; set; }
         [Required]
-        public string Message { get; set; }
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public DeviceErrorCode ErrorCode { get; set; } = DeviceErrorCode.None;
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public Device Device { get; set; }
+        public string Designation { get; set; }
+        public string? Location { get; set; }
+        [Required]
+        public string CategoryId { get; set; }
+        [Required]
+        public string Status { get; set; }
     }
 }
