@@ -515,5 +515,37 @@ namespace ServiceLog.Services
                 };
             }
         }
+
+        public async Task<MyTicketsResponseDto> GetMyTicketsAsync(string userId)
+        {
+            try
+            {
+                var tickets = await _ticketRepository.GetAllTicketsAsync(new TicketFilter { ClientId = userId });
+                if (tickets == null || !tickets.Any())
+                {
+                    return new MyTicketsResponseDto
+                    {
+                        Success = false,
+                        Message = "No tickets found for this user.",
+                        ErrorCode = TicketErrorCode.TicketNotFound
+                    };
+                }
+                return new MyTicketsResponseDto
+                {
+                    Success = true,
+                    Message = "Your tickets retrieved successfully.",
+                    Tickets = tickets
+                };
+            }
+            catch
+            {
+                return new MyTicketsResponseDto
+                {
+                    Success = false,
+                    Message = "An error occurred while retrieving your tickets.",
+                    ErrorCode = TicketErrorCode.Unknown
+                };
+            }
+        }
     }
 }

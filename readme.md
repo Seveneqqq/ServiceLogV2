@@ -50,6 +50,51 @@ ServiceLog is a modern device service management system built with REST API arch
 - **Docker** - Application containerization
 - **Multi-stage builds** - Docker image optimization
 
+## 📝 API Endpoints
+
+### Auth
+- **POST** `/api/Auth/register` – Register a new user  
+- **POST** `/api/Auth/login` – Log in an existing user  
+
+### Category
+- **POST** `/api/Category` – Create a new category  
+- **GET** `/api/Category` – Display all categories  
+- **GET** `/api/Category/{id}` – Display a category by ID  
+- **PUT** `/api/Category/{id}` – Update an existing category  
+- **DELETE** `/api/Category/{id}` – Delete a category by ID  
+
+### Device
+- **POST** `/api/Device` – Create a new device  
+- **GET** `/api/Device` – Get all devices  
+- **GET** `/api/Device/{id}` – Display a device by ID  
+- **PUT** `/api/Device/{id}` – Update an existing device  
+- **DELETE** `/api/Device/{id}` – Delete a device by ID  
+- **GET** `/api/Device/{id}/service-history` – Display service history for a device  
+
+### ServiceHistory
+- **POST** `/api/ServiceHistory` – Create a new service history  
+- **GET** `/api/ServiceHistory` – Get all service histories  
+- **GET** `/api/ServiceHistory/{id}` – Display a service history by ID  
+- **PUT** `/api/ServiceHistory/{id}` – Update a service history  
+- **DELETE** `/api/ServiceHistory/{id}` – Delete a service history  
+
+### Ticket
+- **POST** `/api/Ticket` – Create a new ticket  
+- **GET** `/api/Ticket` – Display all tickets  
+- **GET** `/api/Ticket/{id}` – Get a ticket by ID  
+- **PUT** `/api/Ticket/{id}` – Update a ticket  
+- **DELETE** `/api/Ticket/{id}` – Delete a ticket  
+- **GET** `/api/Ticket/my-tickets` – Get all tickets for the authenticated user  
+- **POST** `/api/Ticket/{id}/devices` – Add devices to a ticket  
+- **PATCH** `/api/Ticket/{id}/change-status` – Change ticket status  
+- **PATCH** `/api/Ticket/{ticketId}/assign-technican` – Assign a technician to a ticket  
+
+### User
+- **GET** `/api/User` – Display all users  
+- **GET** `/api/User/{id}` – Get a user by ID  
+- **PUT** `/api/User/{id}` – Update a user  
+- **DELETE** `/api/User/{id}` – Delete a user  
+
 ## 🔒 Security Features
 
 ### Authentication & Authorization

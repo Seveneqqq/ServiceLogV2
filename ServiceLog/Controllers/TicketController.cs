@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ServiceLog.Filters;
@@ -130,7 +131,34 @@ namespace ServiceLog.Controllers
             }
         }
 
-        //Todo: Dodanie wyświetlania ticketów tylko danego użytkownika
+        /// <summary>
+        /// Get all tickets for the authenticated user
+        /// </summary>
+        [Authorize(Roles = "Client, Technican, Admin")]
+        [HttpGet("my-tickets")]
+        public async Task<IActionResult> GetMyTicketsAsync()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            try
+            {
+                var result = await _ticketService.GetMyTicketsAsync(userId);
+                if (result.Success)
+                {
+                    return Ok(result);
+                }
+                return result.ErrorCode switch
+                {
+                    TicketErrorCode.TicketNotFound => NotFound(result),
+                    TicketErrorCode.InvalidData => Unauthorized(result),
+                    TicketErrorCode.EmptyFields => BadRequest(result),
+                    _ => BadRequest(result)
+                };
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"Error:: {e.Message}");
+            }
+        }
 
         /// <summary>
         /// Update an existing ticket by ID
